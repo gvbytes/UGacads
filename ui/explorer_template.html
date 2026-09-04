@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APTG Data Explorer</title>
+<style>
+:root{
+  --paper:#faf9f7; --ink:#1a1a1a; --muted:#6b6560; --faint:#918a83;
+  --rule:#d8d4cc; --rule-strong:#b8b2a8; --panel:#f2f0ec;
+  --accent:#5a6b47; --warn:#8b4a2f;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --serif:Georgia,"Times New Roman",serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{--paper:#1a1917;--ink:#e8e4dd;--muted:#a09a92;--faint:#7d766e;
+        --rule:#35322d;--rule-strong:#4a463f;--panel:#232120;
+        --accent:#9bb07c;--warn:#c88562;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+     font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent}
+a:hover{border-bottom-color:var(--accent)}
+code,.mono{font-family:var(--mono);font-size:.92em}
+
+.wrap{display:grid;grid-template-columns:200px 1fr;min-height:100vh}
+nav{border-right:1px solid var(--rule);padding:22px 0;position:sticky;top:0;
+    height:100vh;overflow:auto}
+nav h1{font:600 15px/1.3 var(--serif);margin:0 20px 4px;letter-spacing:.01em}
+nav .sub{margin:0 20px 20px;color:var(--faint);font-size:11.5px;line-height:1.45}
+nav button{display:block;width:100%;text-align:left;background:none;border:0;
+  padding:6px 20px;font:inherit;color:var(--muted);cursor:pointer;
+  border-left:2px solid transparent}
+nav button:hover{color:var(--ink)}
+nav button[aria-current="true"]{color:var(--ink);border-left-color:var(--accent);
+  background:var(--panel);font-weight:500}
+nav .grp{margin:18px 20px 5px;font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--faint)}
+
+main{padding:26px 30px 70px;max-width:1180px;min-width:0}
+h2{font:500 20px/1.3 var(--serif);margin:0 0 3px}
+.lede{color:var(--muted);margin:0 0 20px;max-width:70ch;font-size:13px}
+
+.stats{display:flex;flex-wrap:wrap;gap:0;border-top:1px solid var(--rule);
+  border-bottom:1px solid var(--rule);margin:0 0 22px}
+.stat{padding:10px 22px 10px 0;margin-right:22px;border-right:1px solid var(--rule)}
+.stat:last-child{border-right:0}
+.stat b{display:block;font:500 19px/1.2 var(--serif);font-variant-numeric:tabular-nums}
+.stat span{font-size:11px;color:var(--faint);letter-spacing:.03em}
+
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px;align-items:center}
+input[type=search],select{font:inherit;font-size:12.5px;padding:5px 8px;
+  background:var(--paper);color:var(--ink);
+  border:1px solid var(--rule-strong);border-radius:2px}
+input[type=search]{min-width:230px}
+input:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.count{color:var(--faint);font-size:12px;margin-left:auto;font-variant-numeric:tabular-nums}
+
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th{text-align:left;font-weight:500;color:var(--faint);font-size:10.5px;
+  letter-spacing:.07em;text-transform:uppercase;padding:0 10px 6px 0;
+  border-bottom:1px solid var(--rule-strong);white-space:nowrap}
+td{padding:5px 10px 5px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+tbody tr:hover{background:var(--panel)}
+.num{text-align:right;font-variant-numeric:tabular-nums;padding-right:16px}
+
+.tag{display:inline-block;font-size:10px;letter-spacing:.05em;padding:1px 5px;
+  border:1px solid var(--rule-strong);color:var(--muted);border-radius:2px;
+  margin-right:3px;white-space:nowrap}
+.tag.on{border-color:var(--accent);color:var(--accent)}
+.tag.warn{border-color:var(--warn);color:var(--warn)}
+.flag{color:var(--warn);font-weight:500}
+.dim{color:var(--faint)}
+
+.chain{font-family:var(--mono);font-size:11.5px;line-height:1.9}
+.chain i{font-style:normal;color:var(--faint)}
+.chain b{font-weight:500}
+
+.note{border-left:2px solid var(--rule-strong);padding:2px 0 2px 14px;
+  color:var(--muted);margin:0 0 18px;max-width:78ch;font-size:12.5px}
+.note.warn{border-left-color:var(--warn)}
+.section{margin:30px 0 0}
+.section h3{font:500 14px/1.3 var(--serif);margin:0 0 8px;
+  padding-bottom:5px;border-bottom:1px solid var(--rule)}
+.hidden{display:none}
+.q{font-family:var(--mono);font-size:11px;color:var(--muted);
+   max-width:640px;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <h1>APTG Data</h1>
+  <p class="sub">IIT Kanpur academic pathway dataset. Built deterministically from
+  published sources.</p>
+  <div class="grp">Catalogue</div>
+  <button data-v="overview" aria-current="true">Overview</button>
+  <button data-v="courses">Courses</button>
+  <button data-v="prereqs">Prerequisites</button>
+  <button data-v="chains">Chain spans</button>
+  <div class="grp">Programmes</div>
+  <button data-v="programmes">Programmes</button>
+  <button data-v="templates">Templates</button>
+  <button data-v="minors">Minors</button>
+  <div class="grp">Rules</div>
+  <button data-v="policy">Policy</button>
+  <div class="grp">Provenance</div>
+  <button data-v="quarantine">Quarantine</button>
+</nav>
+<main id="main"></main>
+</div>
+<script id="data" type="application/json">/*__APTG_DATA__*/null</script>
+<script>
+const D = JSON.parse(document.getElementById('data').textContent);
+const main = document.getElementById('main');
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num = n => (n ?? 0).toLocaleString('en-IN');
+
+function stats(pairs){
+  return `<div class="stats">${pairs.map(([v,l])=>
+    `<div class="stat"><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}</div>`;
+}
+function table(cols, rows, render){
+  return `<table><thead><tr>${cols.map(c=>
+    `<th${c.num?' class="num"':''}>${esc(c.label)}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map(render).join('')}</tbody></table>`;
+}
+function parityTag(p){
+  if(!p) return '<span class="tag dim">unknown</span>';
+  return `<span class="tag${p==='BOTH'?' on':''}">${esc(p.toLowerCase())}</span>`;
+}
+function confTag(c){
+  if(c==='TENTATIVE') return '<span class="tag warn">tentative</span>';
+  if(c==='DERIVED') return '<span class="tag">derived</span>';
+  return '<span class="tag on">observed</span>';
+}
+
+const views = {};
+
+views.overview = () => {
+  const r = D.report || {stats:{},warnings:[],violations:[]};
+  const s = r.stats || {};
+  const par = s.parity || {};
+  return `<h2>Overview</h2>
+  <p class="lede">Every figure below is produced by the ingestion run, not typed in.
+  Rows carry the file, locator and hash they came from, and a confidence of observed,
+  derived or tentative.</p>
+  ${stats([
+    [num(s.courses), 'courses'],
+    [num(s.courses_ug), 'undergraduate'],
+    [num(s.offerings), 'offerings'],
+    [num(s.prereq_edges), 'prerequisite edges'],
+    [num(s.programmes), 'programmes'],
+    [num(s.minor_baskets), 'minor baskets'],
+  ])}
+  <div class="section"><h3>Semester availability</h3>
+  ${stats([
+    [num(par.ODD), 'odd only'],
+    [num(par.EVEN), 'even only'],
+    [num(par.BOTH), 'both parities'],
+  ])}
+  <p class="note">Availability is observed from three Pingala exports: two odd
+  semesters from different years and one even semester. A course seen only in odd
+  terms cannot be scheduled in an even one, which is what stretches prerequisite
+  chains across more semesters than their depth alone implies.</p></div>
+
+  <div class="section"><h3>Extraction quality</h3>
+  ${stats([
+    [num(s.semester_specs_validated)+' / '+num(s.semester_specs), 'semester credit totals validated'],
+    [num(s.prereq_unresolved), 'prerequisite codes not offered'],
+    [num(D.quarantine.length), 'rows quarantined'],
+  ])}
+  ${(r.warnings||[]).map(w=>`<p class="note warn">${esc(w)}</p>`).join('')}
+  ${(r.violations||[]).length
+     ? `<p class="note warn"><span class="flag">Violations:</span> ${r.violations.map(esc).join('; ')}</p>`
+     : `<p class="note">No invariant violations. The prerequisite graph is acyclic, every
+        coded course has parsed credits, every offered course has a parity, and no
+        internship semester carries elective capacity.</p>`}
+  </div>
+
+  <div class="section"><h3>Sources</h3>
+  ${table([{label:'Term'},{label:'Parity'},{label:'Era'},{label:'File'}], D.terms,
+    t=>`<tr><td class="mono">${esc(t.term_id)}</td><td>${parityTag(t.parity)}</td>
+    <td class="dim">${esc(t.era)}</td><td class="mono dim">${esc(t.source_file)}</td></tr>`)}
+  </div>`;
+};
+
+views.courses = () => {
+  const depts = [...new Set(D.courses.map(c=>c.department).filter(Boolean))].sort();
+  return `<h2>Courses</h2>
+  <p class="lede">${num(D.courses.length)} courses drawn from the three schedule exports,
+  plus the title-only B.Cyber curriculum.</p>
+  <div class="controls">
+    <input type="search" id="q" placeholder="Code or title">
+    <select id="dept"><option value="">All departments</option>
+      ${depts.map(d=>`<option>${esc(d)}</option>`).join('')}</select>
+    <select id="lvl"><option value="">All levels</option>
+      <option value="ug">Undergraduate</option><option value="pg">Postgraduate</option></select>
+    <select id="par"><option value="">Any parity</option>
+      <option>ODD</option><option>EVEN</option><option>BOTH</option></select>
+    <select id="pre"><option value="">Any</option>
+      <option value="y">Has prerequisites</option><option value="n">No prerequisites</option></select>
+    <span class="count" id="count"></span>
+  </div>
+  <div id="rows"></div>`;
+};
+
+views.courses.mount = () => {
+  const q=document.getElementById('q'), dept=document.getElementById('dept'),
+        lvl=document.getElementById('lvl'), par=document.getElementById('par'),
+        pre=document.getElementById('pre');
+  const draw = () => {
+    const t=q.value.trim().toLowerCase();
+    const rows = D.courses.filter(c=>{
+      if(t && !((c.code||'').toLowerCase().includes(t) || (c.title||'').toLowerCase().includes(t))) return false;
+      if(dept.value && c.department!==dept.value) return false;
+      if(lvl.value==='ug' && !c.is_ug) return false;
+      if(lvl.value==='pg' && c.is_ug) return false;
+      if(par.value && c.parity!==par.value) return false;
+      if(pre.value==='y' && !c.n_prereq) return false;
+      if(pre.value==='n' && c.n_prereq) return false;
+      return true;
+    });
+    document.getElementById('count').textContent = num(rows.length)+' of '+num(D.courses.length);
+    document.getElementById('rows').innerHTML = table(
+      [{label:'Code'},{label:'Title'},{label:'Dept'},{label:'L-T-P-S'},
+       {label:'Credits',num:true},{label:'Parity'},{label:'Prereq',num:true}],
+      rows.slice(0,600),
+      c=>`<tr><td class="mono">${esc(c.code||'—')}</td>
+        <td>${esc(c.title)}${c.identity_mode==='TITLE_ONLY'?' <span class="tag warn">title only</span>':''}</td>
+        <td class="dim">${esc(c.department||'')}</td>
+        <td class="mono dim">${esc(c.ltps||'')}</td>
+        <td class="num">${c.credits??''}</td>
+        <td>${parityTag(c.parity)}</td>
+        <td class="num">${c.n_prereq||''}</td></tr>`);
+    if(rows.length>600)
+      document.getElementById('rows').insertAdjacentHTML('beforeend',
+        `<p class="note">Showing the first 600 of ${num(rows.length)} matches. Narrow the filters to see the rest.</p>`);
+  };
+  [q,dept,lvl,par,pre].forEach(el=>el.addEventListener('input',draw));
+  draw();
+};
+
+views.prereqs = () => {
+  // The same expression is recorded once per term the course is offered in, so group
+  // by course and expression and keep each prerequisite code once.
+  const byExpr = new Map();
+  D.edges.forEach(e=>{
+    const k = e.course_code+'|'+e.expr_raw;
+    if(!byExpr.has(k)) byExpr.set(k,{course:e.course_code,raw:e.expr_raw,
+      ambiguous:e.ambiguous,srcs:new Set(),codes:new Map()});
+    const g = byExpr.get(k);
+    g.srcs.add(e.source_file);
+    if(!g.codes.has(e.prereq_code))
+      g.codes.set(e.prereq_code,{c:e.prereq_code,r:e.resolved,g:e.alternative_group});
+  });
+  const rows=[...byExpr.values()]
+    .map(r=>({...r,codes:[...r.codes.values()],srcs:[...r.srcs].sort()}))
+    .sort((a,b)=>a.course.localeCompare(b.course));
+  const amb = rows.filter(r=>r.ambiguous);
+  const unresCodes = new Set();
+  rows.forEach(r=>r.codes.forEach(c=>{ if(!c.r) unresCodes.add(c.c); }));
+  return `<h2>Prerequisites</h2>
+  <p class="lede">Pingala stores prerequisites as small boolean strings. Each is parsed
+  twice: mechanically, and again under a variant-grouping rule that treats old and new
+  codes for the same course as alternatives.</p>
+  ${stats([[num(rows.length),'expressions'],[num(D.edges.length),'edges (one per term)'],
+           [num(amb.length),'ambiguous'],[num(unresCodes.size),'unresolved codes']])}
+  <p class="note warn">An expression such as
+  <code>( ESO201 OR ESO201A AND ESO204A OR ESO204 )</code> reads mechanically as
+  <code>ESO201 OR (ESO201A AND ESO204A) OR ESO204</code>, but ESO201/ESO201A and
+  ESO204/ESO204A are old and new codes for the same two courses, so the intended
+  reading is <code>(ESO201 OR ESO201A) AND (ESO204A OR ESO204)</code>. Both readings are
+  stored; rows marked ambiguous are the ones where they disagree.</p>
+  <div class="controls">
+    <input type="search" id="pq" placeholder="Course code">
+    <select id="pf"><option value="">All</option>
+      <option value="amb">Ambiguous only</option>
+      <option value="unres">With unresolved codes</option></select>
+    <span class="count" id="pcount"></span>
+  </div>
+  <div id="prows" data-rows='${esc(JSON.stringify(rows))}'></div>`;
+};
+
+views.prereqs.mount = () => {
+  const host=document.getElementById('prows');
+  const all=JSON.parse(host.dataset.rows);
+  const pq=document.getElementById('pq'), pf=document.getElementById('pf');
+  const draw=()=>{
+    const t=pq.value.trim().toLowerCase();
+    const rows=all.filter(r=>{
+      if(t && !r.course.toLowerCase().includes(t)) return false;
+      if(pf.value==='amb' && !r.ambiguous) return false;
+      if(pf.value==='unres' && r.codes.every(c=>c.r)) return false;
+      return true;
+    });
+    document.getElementById('pcount').textContent=num(rows.length)+' of '+num(all.length);
+    host.innerHTML=table(
+      [{label:'Course'},{label:'Requires'},{label:'Raw expression'},{label:'Source'}],
+      rows,
+      r=>`<tr><td class="mono">${esc(r.course)}</td>
+      <td>${r.codes.map(c=>`<span class="tag${c.r?'':' warn'}" title="${c.r?'offered':'not offered in any loaded term'}">${esc(c.c)}${c.g?'<i> ·alt'+c.g+'</i>':''}</span>`).join('')}</td>
+      <td class="q">${esc(r.raw)}${r.ambiguous?' <span class="tag warn">ambiguous</span>':''}</td>
+      <td class="dim mono" style="font-size:10.5px">${r.srcs.map(esc).join('<br>')}</td></tr>`);
+  };
+  [pq,pf].forEach(el=>el.addEventListener('input',draw));
+  draw();
+};
+
+views.chains = () => {
+  const ext = D.chains.filter(c=>c.forces_extension);
+  return `<h2>Chain spans</h2>
+  <p class="lede">How far a prerequisite chain reaches once semester parity is applied.
+  A chain of courses taught only in even semesters advances two semesters per link, not
+  one, so shallow chains can still overrun an eight-semester degree.</p>
+  ${stats([[num(D.chains.length),'chains'],
+           [num(ext.length),'force extension past semester 8'],
+           [num(Math.max(0,...D.chains.map(c=>c.depth))),'deepest chain']])}
+  <p class="note">Two starting points are shown. <b>From 1</b> is a student following
+  the chain from the beginning of the degree. <b>From 5</b> stands for one who declares
+  a Minor late, in the middle of the third year — the case where parity begins to bind.</p>
+  <div class="controls">
+    <input type="search" id="cq" placeholder="Course code">
+    <select id="cf"><option value="">All chains</option>
+      <option value="ext">Forces extension</option></select>
+    <span class="count" id="ccount"></span>
+  </div>
+  <div id="crows"></div>`;
+};
+
+views.chains.mount = () => {
+  const cq=document.getElementById('cq'), cf=document.getElementById('cf');
+  const draw=()=>{
+    const t=cq.value.trim().toLowerCase();
+    const rows=D.chains.filter(c=>{
+      if(t && !c.steps.some(s=>s.code.toLowerCase().includes(t))) return false;
+      if(cf.value==='ext' && !c.forces_extension) return false;
+      return true;
+    });
+    document.getElementById('ccount').textContent=num(rows.length)+' of '+num(D.chains.length);
+    document.getElementById('crows').innerHTML=table(
+      [{label:'Target'},{label:'Depth',num:true},{label:'From 1',num:true},
+       {label:'From 5',num:true},{label:'Chain'}],
+      rows.slice(0,300),
+      c=>`<tr><td class="mono">${esc(c.target)}</td>
+      <td class="num">${c.depth}</td>
+      <td class="num">${c.from_sem1}</td>
+      <td class="num${c.forces_extension?' flag':''}">${c.from_sem5}</td>
+      <td class="chain">${c.steps.map((s,i)=>
+        `${i?' <i>&rarr;</i> ':''}<b>${esc(s.code)}</b><i>&nbsp;S${s.sem}&nbsp;${esc(s.parity.toLowerCase())}</i>`).join('')}</td></tr>`);
+  };
+  [cq,cf].forEach(el=>el.addEventListener('input',draw));
+  draw();
+};
+
+views.programmes = () => {
+  const specsBy = {};
+  D.specs.forEach(s=>(specsBy[s.programme_id]=specsBy[s.programme_id]||[]).push(s));
+  return `<h2>Programmes</h2>
+  <p class="lede">${num(D.programmes.length)} programmes. Semesters are typed: coursework
+  semesters can host electives, internship semesters cannot.</p>
+  <p class="note">B.Cyber is the case that makes the distinction matter. Its semesters 5
+  to 8 are full-time internship at 54 credits each, so a Minor is not merely hard to
+  schedule there, it is structurally impossible. That falls out of the semester type
+  rather than being special-cased.</p>
+  ${table([{label:'Programme'},{label:'Kind'},{label:'Dept'},{label:'Batch from'},
+           {label:'Batch to'},{label:'Semesters'},{label:'Confidence'}],
+    D.programmes,
+    p=>`<tr><td class="mono">${esc(p.programme_id)}</td>
+    <td>${esc(p.kind)}</td><td class="dim">${esc(p.department||p.school||'')}</td>
+    <td class="mono">${esc(p.batch_from||'')}</td><td class="mono">${esc(p.batch_to||'')}</td>
+    <td>${(specsBy[p.programme_id]||[]).map(s=>
+      `<span class="tag${s.kind==='INTERNSHIP'?' warn':''}" title="${esc(s.kind)}">${s.semester_no}</span>`).join('')}</td>
+    <td>${confTag(p.confidence)}</td></tr>`)}`;
+};
+
+views.templates = () => {
+  const ids=[...new Set(D.specs.map(s=>s.programme_id))].sort();
+  return `<h2>Templates</h2>
+  <p class="lede">Semester grids recovered from the DOAA template PDFs. Credits summed
+  from the extracted slots are checked against the total printed on the template.</p>
+  <div class="controls">
+    <select id="tp">${ids.map(i=>`<option>${esc(i)}</option>`).join('')}</select>
+    <span class="count" id="tcount"></span>
+  </div>
+  <div id="trows"></div>`;
+};
+
+views.templates.mount = () => {
+  const tp=document.getElementById('tp');
+  const draw=()=>{
+    const id=tp.value;
+    const specs=D.specs.filter(s=>s.programme_id===id).sort((a,b)=>a.semester_no-b.semester_no);
+    const slots=D.slots.filter(s=>s.programme_id===id);
+    document.getElementById('tcount').textContent=num(slots.length)+' slots';
+    document.getElementById('trows').innerHTML = specs.map(s=>{
+      const mine=slots.filter(x=>x.semester_no===s.semester_no);
+      const agree=s.confidence==='OBSERVED';
+      return `<div class="section"><h3>Semester ${s.semester_no}
+        <span class="tag${s.kind==='INTERNSHIP'?' warn':''}">${esc(s.kind.toLowerCase())}</span>
+        <span class="dim" style="font-weight:400;font-size:12px">
+        extracted ${s.credits_min ?? '—'}${s.credits_max!==s.credits_min?'–'+s.credits_max:''},
+        printed ${esc(s.printed_total ?? 'not found')}</span>
+        ${agree?'<span class="tag on">validated</span>':'<span class="tag warn">unchecked</span>'}</h3>
+        ${mine.length?table([{label:'Slot'},{label:'Type'},{label:'Course'},{label:'Credits',num:true}],
+          mine, x=>`<tr><td>${esc(x.slot_label)}${x.is_choice?' <span class="tag">choice</span>':''}</td>
+          <td class="dim">${esc(x.slot_type)}</td><td class="mono">${esc(x.course_code||'')}</td>
+          <td class="num">${x.credits??''}</td></tr>`):'<p class="note">No slots extracted.</p>'}
+      </div>`;
+    }).join('');
+  };
+  tp.addEventListener('change',draw); draw();
+};
+
+views.minors = () => `<h2>Minors</h2>
+  <p class="lede">${num(D.minors.length)} baskets, one per <em>stream</em>: CSE publishes
+  four, CHM three, HSS three, EE five, and a student reads one of them.</p>
+  <p class="note">A compulsory group written <span class="tag">A|B</span> means either
+  course satisfies it. Where a department revised its Minor under the new UGARC it
+  appears twice, once per batch window — the clearest batch-dependent rule in the
+  published data. Codes struck from a basket are courses the source lists that no loaded
+  term offers; they are quarantined, and a basket left unable to reach its stated credit
+  floor is marked TENTATIVE.</p>
+  ${table([{label:'Minor'},{label:'Stream'},{label:'Batch'},{label:'Compulsory'},
+           {label:'Choose',num:true},{label:'From'},{label:'Credits'},{label:'CPI',num:true},
+           {label:'Seats',num:true},{label:'Not offered'},{label:'Conf'}],
+   D.minors,
+   m=>`<tr><td class="mono">${esc(m.minor_id)}</td>
+   <td>${esc(m.stream)}${m.title===m.stream?'':`<div class="dim" style="font-size:11.5px">${esc(m.title)}</div>`}</td>
+   <td class="mono dim">${esc(m.batch_from||'…')}–${esc(m.batch_to||'…')}</td>
+   <td>${(m.compulsory_codes||'').split(',').filter(Boolean).map(c=>`<span class="tag">${esc(c.replace(/\|/g,' or '))}</span>`).join('')}</td>
+   <td class="num">${m.choose_n??''}</td>
+   <td>${(m.choice_codes||'').split(',').filter(Boolean).slice(0,8).map(c=>`<span class="tag">${esc(c)}</span>`).join('')}</td>
+   <td class="mono">${m.credits_min===m.credits_max?esc(m.credits_min??''):esc(`${m.credits_min}–${m.credits_max}`)}</td>
+   <td class="num">${m.cpi_min??''}</td>
+   <td class="num">${m.seat_cap??''}</td>
+   <td class="dim" style="font-size:11.5px;max-width:22ch">${esc((m.unresolved_codes||'').split(',').filter(Boolean).join(' '))}</td>
+   <td>${confTag(m.confidence)}</td></tr>`)}`;
+
+views.policy = () => `<h2>Policy and eligibility</h2>
+  <p class="lede">Hand-transcribed rules, each quoting and citing its source. These are
+  the hard constraints a roadmap must satisfy.</p>
+  <div class="section"><h3>Credit rules</h3>
+  ${table([{label:'Rule'},{label:'Name'},{label:'Min',num:true},{label:'Max',num:true},
+           {label:'Unit'},{label:'Citation'}],
+   D.policy,
+   p=>`<tr><td class="mono">${esc(p.rule_id)}</td><td>${esc(p.name)}
+   <div class="dim" style="font-size:11.5px;max-width:60ch">${esc(p.text)}</div></td>
+   <td class="num">${p.value_min??''}</td><td class="num">${p.value_max??''}</td>
+   <td class="dim">${esc(p.unit||'')}</td>
+   <td class="dim mono" style="font-size:10.5px">${esc(p.citation)}</td></tr>`)}</div>
+  <div class="section"><h3>Batch-gated programme options</h3>
+  ${table([{label:'Rule'},{label:'Option'},{label:'Dept'},{label:'Batch from'},
+           {label:'Eligible'},{label:'Citation'}],
+   D.eligibility,
+   e=>`<tr><td class="mono">${esc(e.rule_id)}</td><td>${esc(e.option)}
+   <div class="dim" style="font-size:11.5px;max-width:60ch">${esc(e.text)}</div></td>
+   <td class="dim">${esc(e.department||e.programme_id||'')}</td>
+   <td class="mono">${esc(e.batch_from||'')}</td>
+   <td class="${e.eligible?'':'flag'}">${e.eligible?'yes':'no'}</td>
+   <td class="dim mono" style="font-size:10.5px">${esc(e.citation)}</td></tr>`)}</div>`;
+
+views.quarantine = () => {
+  const kinds={};
+  D.quarantine.forEach(q=>kinds[q.kind]=(kinds[q.kind]||0)+1);
+  return `<h2>Quarantine</h2>
+  <p class="lede">Rows the parsers could not handle. Nothing is dropped silently; every
+  entry keeps the file and locator it came from.</p>
+  ${stats(Object.entries(kinds).sort().map(([k,v])=>[num(v),k]))}
+  <div class="controls">
+    <select id="qk"><option value="">All kinds</option>
+      ${Object.keys(kinds).sort().map(k=>`<option>${esc(k)}</option>`).join('')}</select>
+    <span class="count" id="qcount"></span>
+  </div>
+  <div id="qrows"></div>`;
+};
+
+views.quarantine.mount = () => {
+  const qk=document.getElementById('qk');
+  const draw=()=>{
+    const rows=D.quarantine.filter(q=>!qk.value||q.kind===qk.value);
+    document.getElementById('qcount').textContent=num(rows.length)+' of '+num(D.quarantine.length);
+    document.getElementById('qrows').innerHTML=table(
+      [{label:'Kind'},{label:'Reason'},{label:'Raw'},{label:'Source'}],
+      rows.slice(0,400),
+      q=>`<tr><td class="mono dim">${esc(q.kind)}</td><td>${esc(q.reason)}</td>
+      <td class="q">${esc(q.raw)}</td>
+      <td class="dim mono" style="font-size:10.5px">${esc(q.source_file)}<br>${esc(q.source_locator)}</td></tr>`);
+  };
+  qk.addEventListener('change',draw); draw();
+};
+
+function show(name){
+  document.querySelectorAll('nav button').forEach(b=>
+    b.setAttribute('aria-current', String(b.dataset.v===name)));
+  main.innerHTML = views[name]();
+  if(views[name].mount) views[name].mount();
+  main.scrollTop = 0;
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('nav button').forEach(b=>
+  b.addEventListener('click',()=>show(b.dataset.v)));
+show('overview');
+</script>
+</body>
+</html>
