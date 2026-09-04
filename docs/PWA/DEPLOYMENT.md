@@ -30,18 +30,46 @@ alternative exists.
 | GET | `/api/courses?q=` | course lookup |
 | POST | `/api/plan` | profile and preferences in, roadmap out |
 
-## A note on GitHub Pages
+## GitHub Pages
 
-GitHub Pages serves static files only. It cannot execute the Python scheduler, so the
-full application cannot run there unmodified.
+Pages serves files, not processes, so there is no server to answer `/api/*`. Rather than
+ship a cut-down reimplementation in JavaScript — which would leave two engines to keep in
+step and break the requirement that the result be reproducible — the site carries a
+Python runtime and runs **the same engine source** in the browser under Pyodide.
 
-What **is** published to Pages is the **data explorer** (`ui/explorer.html`) — a
-self-contained page with the dataset embedded, which needs no server. It exposes the
-course catalogue, the prerequisite expressions, computed chain spans, the templates,
-minors, policy rules and the ingestion quarantine, and is the surface on which the
-extraction can be inspected and disputed.
+Two pages are published:
 
-To host the interactive planner itself, the options are a platform that runs Python
-(Render, Fly, Railway, PythonAnywhere — `serve.py` runs unmodified), or compiling the
-engine to run in the browser under Pyodide. The second keeps everything on Pages at the
-cost of shipping a Python runtime to the client.
+| Page | What it is |
+|---|---|
+| `index.html` | the planner, solving client-side |
+| `explorer.html` | the data explorer, on which the extraction can be checked |
+
+The build is `python -m aptg_ingest.webbuild`, and it does three things: copies the
+engine package verbatim, trims the database to the tables the engine actually reads
+(2.8 MB to 1.8 MB — the course master, aliases and quarantine exist to audit the build,
+not to solve), and rewrites `ui/app.html` so it waits for the runtime and routes its API
+calls to it. The page is otherwise the file the local server serves, so the two cannot
+drift apart.
+
+A test checks the trim list against the SQL the engine issues, because dropping a table
+would not fail the build — it would fail at solve time in a visitor's browser.
+
+### What a visitor downloads
+
+Roughly 1.8 MB of database, 29 kB of page, 81 kB of engine, and the Pyodide runtime from
+jsDelivr. First load takes a few seconds behind a progress indicator; solving afterwards
+is immediate. Nothing the visitor types leaves the tab.
+
+### Enabling it
+
+In the repository, **Settings → Pages → Source: GitHub Actions**. The workflow at
+`.github/workflows/pages.yml` rebuilds the database from source, runs the test suite, and
+publishes only if both succeed.
+
+Pages on a private repository requires a paid plan; on the free tier the repository must
+be public.
+
+### If you would rather run it server-side
+
+`serve.py` runs unmodified on any platform that executes Python — Render, Fly, Railway,
+PythonAnywhere. That avoids the runtime download at the cost of hosting.

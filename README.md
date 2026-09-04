@@ -33,7 +33,7 @@ yields the same roadmap; a test asserts it.
 |---|---|
 | [Algorithmic Framework Report](docs/AFR/README.md) | architecture, ingestion, graph routing, constraints, explainability, worked edge cases |
 | [Database schema](SCHEMA.md) | all 16 tables, with provenance and confidence semantics |
-| [Deployment](docs/PWA/DEPLOYMENT.md) | running locally, endpoints, and the GitHub Pages constraint |
+| [Deployment](docs/PWA/DEPLOYMENT.md) | running locally, endpoints, and the browser build published to Pages |
 | [Video notes](docs/VCA/README.md) | what the five-minute demonstration should cover |
 
 ## Layout

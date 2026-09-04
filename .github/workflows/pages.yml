@@ -1,8 +1,14 @@
-name: Deploy data explorer to GitHub Pages
+name: Deploy to GitHub Pages
 
-# The interactive planner needs the Python scheduler and cannot run on Pages. What is
-# published here is the data explorer: a self-contained page with the dataset embedded,
-# on which the extraction can be inspected. See docs/PWA/DEPLOYMENT.md.
+# Publishes two pages, both static:
+#
+#   index.html     the planner. GitHub Pages runs no server, so the CSED engine is
+#                  executed in the visitor's browser under Pyodide — the same engine
+#                  source the local server imports, so results are identical.
+#   explorer.html  the data explorer, on which the extraction itself can be checked.
+#
+# The database is rebuilt from the committed sources on every push, so what is published
+# is never stale relative to the data in the repository.
 
 on:
   push:
@@ -23,19 +29,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
       - name: Install dependencies
-        run: pip install pypdf
+        run: pip install pypdf pytest
+
       - name: Build the database
         run: python -m aptg_ingest.cli --data data --out out --strict
         env:
           PYTHONPATH: src
-      - name: Render the explorer
-        run: python -m aptg_ingest.explorer --db out/aptg.sqlite --out site/index.html
+
+      - name: Run the test suite
+        run: python -m pytest tests -q
         env:
           PYTHONPATH: src
+
+      - name: Assemble the site
+        run: python -m aptg_ingest.webbuild --root . --db out/aptg.sqlite --site site
+        env:
+          PYTHONPATH: src
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
