@@ -587,48 +587,11 @@ class Engine:
                     + "."
                 )
 
-        # A transcript may be written in codes the current catalogue no longer uses.
-        # Resolve them before anything else, so an old-UGARC student is credited for
-        # what they actually passed instead of being told to take it again.
-        translated: list[str] = []
-        unknown: list[str] = []
-        resolved: set[str] = set()
-        for raw in sorted(profile.completed):
-            code, method = cat.resolve_code(raw)
-            if code is None:
-                unknown.append(raw)
-                continue
-            resolved.add(code)
-            if code != raw:
-                translated.append(f"{raw} -> {code}")
-        profile = replace(profile, completed=resolved)
-
         prog = cat.programmes.get(profile.programme_id)
         if prog is None:
             rm.verdict = INFEASIBLE
             rm.summary = f"Unknown programme {profile.programme_id}."
             return rm
-
-        if translated:
-            rm.log.append(
-                f"{len(translated)} completed course(s) were recorded under codes the "
-                f"current catalogue no longer uses and were mapped to their successors: "
-                + ", ".join(translated[:8])
-                + (" and others" if len(translated) > 8 else "")
-                + "."
-            )
-        if unknown:
-            rm.risks.append(
-                RiskFlag(
-                    "MEDIUM",
-                    "unknown_completed_code",
-                    f"{len(unknown)} completed course(s) could not be matched to any "
-                    f"course in the catalogue ({', '.join(unknown[:6])}"
-                    + (" and others" if len(unknown) > 6 else "")
-                    + "); they were ignored, so a requirement they satisfy may be "
-                    "scheduled again.",
-                )
-            )
 
         ceiling = min(prefs.max_credits, cat.policy["load.absolute_max"]["value_max"])
         manual_max, duration_rule = self._max_duration(profile)

@@ -229,6 +229,25 @@ def test_batch_specific_templates_get_distinct_programme_ids(dataset):
     assert not ({p.programme_id for p in early} & {p.programme_id for p in later})
 
 
+def test_the_web_build_keeps_every_table_the_engine_reads():
+    """The published site ships a trimmed database; trimming must not remove a table.
+
+    Dropping one would not fail the build — it would fail at solve time in a visitor's
+    browser, which is the worst place to find out. The list is checked against the SQL
+    the engine actually issues.
+    """
+    import re
+
+    from aptg_ingest.webbuild import ENGINE_TABLES
+
+    data_py = (
+        Path(__file__).resolve().parents[1] / "src" / "aptg_engine" / "data.py"
+    ).read_text()
+    read = set(re.findall(r"FROM ([a-z_]+)", data_py))
+    missing = read - set(ENGINE_TABLES)
+    assert not missing, f"web build would drop tables the engine reads: {sorted(missing)}"
+
+
 def test_no_invariant_violations(dataset):
     report = validate(dataset)
     assert report.violations == [], report.violations

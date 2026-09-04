@@ -118,7 +118,7 @@ def build(data_dir: Path, q: Quarantine) -> Dataset:
 
     # Every course reference — template slot and prerequisite alike — is pointed at a
     # row of the course table before anything downstream reads it.
-    resolve_codes(ds, q, aliases, resolver)
+    resolve_codes(ds, q, aliases, resolver, senate_aliases, department_rules)
     reconcile_template_credits(ds, q)
 
     # Minors are loaded after the schedules because their course codes are resolved
@@ -281,7 +281,9 @@ def _prune_self(node: dict, code: str) -> dict:
 
 
 def resolve_codes(ds: Dataset, q: Quarantine, aliases: dict[str, str] | None = None,
-                  resolver: Resolver | None = None) -> None:
+                  resolver: Resolver | None = None,
+                  senate_aliases: dict[str, str] | None = None,
+                  department_rules: list[dict] | None = None) -> None:
     """Point every course reference in the dataset at a row of the course table.
 
     The sources spell the same course three ways. The schedule exports print the code
@@ -405,11 +407,29 @@ def resolve_codes(ds: Dataset, q: Quarantine, aliases: dict[str, str] | None = N
     # course code exactly as the build did — including one a student types in from
     # memory. The whole master mapping is recorded, not only the codes that happened to
     # appear in a template or a basket.
+    senate_aliases = senate_aliases or {}
+    department_rules = department_rules or []
     for frm, to in aliases.items():
         used.setdefault(frm, (to, "TITLE_MATCH"))
+    # Senate-approved mappings are recorded whether or not the legacy code appears
+    # anywhere in the ingested data. They exist precisely for students admitted under
+    # the old UGARC, whose transcripts carry codes the current schedules never print,
+    # so waiting for one to turn up in a template would defeat the purpose. They also
+    # override anything inferred: PHY102A is PHY112 by Senate decision, and MSE497A is
+    # MSE498 rather than the MSE497 a structural rule would produce.
+    for frm, to in senate_aliases.items():
+        used[frm] = (to, "SENATE")
+    for rule in department_rules:
+        pre, dst, suf = rule["from_prefix"], rule["to_prefix"], rule.get("requires_suffix", "")
+        for code in sorted(known):
+            if not code.startswith(dst):
+                continue
+            legacy = pre + code[len(dst):] + suf
+            if legacy not in known:
+                used.setdefault(legacy, (code, "SENATE_DEPT"))
     ds.code_aliases = [
         CodeAlias(from_code=frm, to_code=to, method=method,
-                  confidence=OBSERVED if method == "TITLE_MATCH" else DERIVED)
+                  confidence=OBSERVED if method in ("TITLE_MATCH", "SENATE") else DERIVED)
         for frm, (to, method) in sorted(used.items())
         if to in known
     ]

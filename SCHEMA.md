@@ -58,6 +58,18 @@ engine reports those differently. `discontinued` carries the master's own withdr
 marker.
 
 ### `code_alias`
+`method` records how a mapping was established, in decreasing authority: `SENATE` and
+`SENATE_DEPT` come from the Senate-approved Old-to-New UGARC mapping and override
+everything else, `TITLE_MATCH` from two codes carrying the same title in the Approved
+Course Master, `STEM` from structural inference.
+
+Senate mappings are stored whether or not the legacy code appears anywhere in the
+ingested data, because they exist for the transcripts of students admitted under the old
+UGARC. Some are renumberings no structural rule can derive — PHY102A became PHY112 — and
+at least one corrects an inference that would otherwise look right and be wrong: MSE497A
+maps to MSE498, while MSE497 is the new code for MSE398A.
+
+
 `from_code` → `to_code`, with the `method` that established it (see *Course identity*).
 Persisted rather than recomputed so the mapping is auditable, and so that everything
 reading the database resolves a code the same way the build did — including a student
