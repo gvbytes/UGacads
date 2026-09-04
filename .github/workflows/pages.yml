@@ -1,0 +1,51 @@
+name: Deploy data explorer to GitHub Pages
+
+# The interactive planner needs the Python scheduler and cannot run on Pages. What is
+# published here is the data explorer: a self-contained page with the dataset embedded,
+# on which the extraction can be inspected. See docs/PWA/DEPLOYMENT.md.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install pypdf
+      - name: Build the database
+        run: python -m aptg_ingest.cli --data data --out out --strict
+        env:
+          PYTHONPATH: src
+      - name: Render the explorer
+        run: python -m aptg_ingest.explorer --db out/aptg.sqlite --out site/index.html
+        env:
+          PYTHONPATH: src
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
