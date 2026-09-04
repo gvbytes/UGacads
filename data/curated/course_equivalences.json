@@ -1,0 +1,120 @@
+{
+  "_comment": [
+    "Old-to-new course equivalences from the UGARC restructuring, where one legacy",
+    "course was replaced by a *combination* of new ones. These cannot be expressed as a",
+    "code alias: an alias says two codes name one course, whereas ESC101 was replaced by",
+    "two modular courses taken together.",
+    "",
+    "Why this file has to exist. The Pingala prerequisite strings write the whole family",
+    "as a flat alternation — ESO207 reads '( ESC101A OR ESC111M OR ESC112M OR ESC113M )'",
+    "— which says any one of the four suffices. That is wrong: a student on the new",
+    "structure must take ESC111 *and* one of ESC112/ESC113. Read literally, the engine",
+    "would let a single 7-credit module unlock the whole CSE chain.",
+    "",
+    "How a rewrite is applied. Where a prerequisite expression names two or more of an",
+    "equivalence's `members`, every member is pruned out of the expression and the",
+    "remainder is ANDed with `expression`. On ESO207 the remainder is empty, so the",
+    "result is the equivalence itself. On CS340, '( ESC101A OR ESC111M AND ESC112M OR",
+    "ESC113M AND ESO207 OR ESO207A )' leaves 'ESO207 OR ESO207A', which is ANDed with the",
+    "computing requirement — the reading the department intends. The original string is",
+    "kept in expr_raw and the mechanical parse in expr_ast, so nothing is lost.",
+    "",
+    "Codes are written as the sources print them and are resolved against the course",
+    "table at build time like every other course reference."
+  ],
+  "equivalences": [
+    {
+      "equivalence_id": "esc101.modularised",
+      "name": "Fundamentals of Computing, modularised",
+      "legacy_code": "ESC101A",
+      "members": ["ESC101A", "ESC111M", "ESC112M", "ESC113M"],
+      "expression": {
+        "op": "OR",
+        "args": [
+          {"op": "COURSE", "code": "ESC101A"},
+          {
+            "op": "AND",
+            "args": [
+              {"op": "COURSE", "code": "ESC111M"},
+              {
+                "op": "OR",
+                "args": [
+                  {"op": "COURSE", "code": "ESC112M"},
+                  {"op": "COURSE", "code": "ESC113M"}
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "text": "The single-course Fundamentals of Computing (ESC101) was modularised into ESC111 Fundamentals of Computing-I, ESC112 Fundamentals of Computing-II and ESC113 Computer Methods for Engineers. A student on the new structure takes ESC111 and one of ESC112 or ESC113; a student who cleared the old ESC101 has satisfied the requirement outright. The Pingala prerequisite strings list all four as a flat alternation, which would let ESC111 alone stand for the whole requirement.",
+      "citation": "UGARC report, October 2021 (https://www.cse.iitk.ac.in/users/nitin/talks/Oct2021-UGARC.pdf), Balanced options / Institute core courses: \"CSE Department proposes to modularize ESc101 into ESc(101-103). The first two will be offered every semester by CSE. Students have to do ESc101 & choose another from 102-103.\"",
+      "confidence": "OBSERVED"
+    },
+    {
+      "equivalence_id": "eso207.cs210",
+      "name": "Data Structures and Algorithms under two codes",
+      "legacy_code": "CS210",
+      "members": ["CS210", "CS210A", "ESO207", "ESO207A"],
+      "expression": {
+        "op": "OR",
+        "args": [
+          {"op": "COURSE", "code": "ESO207"},
+          {"op": "COURSE", "code": "CS210"}
+        ]
+      },
+      "text": "Data Structures and Algorithms is published as ESO207/ESO207A in the institute core basket and as CS210/CS210A in the CSE department's own numbering. They are one requirement, satisfied by either. The two codes share no stem, so the structural aliasing rule cannot connect them, and the variant-grouping rule read the Pingala string for CS425 as requiring both at once.",
+      "citation": "IITK_Minor_Courses_Catalogue.md, Computer Science and Engineering: \"ESO207A (Data Structures & Algorithms, 12 credits) or equivalent CS210 is mandatory across all 4 streams.\"",
+      "confidence": "OBSERVED"
+    }
+  ],
+  "_policy_notes": [
+    "Other UGARC recommendations that touch course identity but are not actionable",
+    "against the data held here, recorded so their absence is deliberate rather than an",
+    "oversight. Each is emitted as a policy rule, not as a course rewrite.",
+    "",
+    "* MTH101 split into MTH101M1/M2 and MTH102 into MTH102M1/M2 — the schedule exports",
+    "  carry only MTH101A and MTH102A, so there is nothing to rewrite.",
+    "* CHM102 split into two modules — only CHM102A appears.",
+    "* PHY102/PHY103 replaced by four full-semester Physics courses of which a department",
+    "  chooses two — none of the four appears under a distinct code.",
+    "* TA201 and TA202 moved into the E/SO basket — a slot-type change per template, and",
+    "  the templates held here already carry their own slot types.",
+    "* ESO/SO/CSO/MSO/PSO/HSO consolidated into ESO and SO."
+  ],
+  "policy_rules": [
+    {
+      "rule_id": "ugarc.modularisation",
+      "scope": "UG",
+      "name": "UGARC modularisation of large first-year courses",
+      "value_min": null,
+      "value_max": null,
+      "unit": null,
+      "text": "To deal with large class sizes the UGARC recommended splitting several first-year Institute Core courses into modules: MTH101 into MTH101M1/M2 and MTH102 into MTH102M1/M2, CHM102 into two modules run in both semesters, PHY102/PHY103 into four full-semester courses of which each department chooses two, and ESC101 into ESC111/ESC112/ESC113 with a student taking the first plus one of the other two. Only the ESC101 split is reflected in the schedule exports held here; the rest still appear under their single legacy codes.",
+      "citation": "UGARC report, October 2021, Balanced options / Institute core courses",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "ugarc.eso_basket",
+      "scope": "UG",
+      "name": "E/SO basket after the UGARC review",
+      "value_min": 18,
+      "value_max": null,
+      "unit": "credits",
+      "text": "All existing ESO/SO/CSO/MSO/PSO/HSO courses were consolidated into ESO and SO baskets, with TA201 and TA202 moved into E/SO. The departmental requirement rose by two courses (18 credits) while the E/SO minimum fell from 40 credits to 18.",
+      "citation": "UGARC report, October 2021, Salient Points 1, 3 and 5",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "ugarc.ic_substitution",
+      "scope": "UG",
+      "name": "Substituting an Institute Core course",
+      "value_min": null,
+      "value_max": 1,
+      "unit": "courses",
+      "text": "A student may substitute at most one Institute Core course with another on the recommendation of the DUGC, and only after receiving an E or F grade in an IC course three times.",
+      "citation": "UGARC report, October 2021, Salient Point 4",
+      "confidence": "OBSERVED"
+    }
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "programme": "B.Cyber",
+  "name": "Bachelors in Cybersecurity",
+  "school": "WSAIS (Wadhwani School of AI and Intelligent Systems)",
+  "source": "https://iitk.ac.in/wsais/b-cyber.php",
+  "first_batch": "2026-27",
+  "senate_status": "Senate-approved",
+  "structure_note": "Only 4 semesters of coursework; semesters 5-8 are full-time internship.",
+  "course_codes_published": false,
+  "prerequisites_published": false,
+  "semesters": {
+    "1": [
+      {
+        "title": "Introduction to Electronics",
+        "credits": 14
+      },
+      {
+        "title": "Practical Ethics",
+        "credits": 3
+      },
+      {
+        "title": "Fundamentals of computing",
+        "credits": 14
+      },
+      {
+        "title": "Fundamentals of Data Engineering (Data)",
+        "credits": 12
+      },
+      {
+        "title": "Lab: Malware analysis",
+        "credits": 8
+      }
+    ],
+    "2": [
+      {
+        "title": "Applied Cryptography",
+        "credits": 9
+      },
+      {
+        "title": "Data Structures and Algorithms",
+        "credits": 12
+      },
+      {
+        "title": "Computer Organization",
+        "credits": 12
+      },
+      {
+        "title": "Lab: Digital Forensics",
+        "credits": 8
+      },
+      {
+        "title": "Course from predefined list",
+        "credits": {
+          "min": 9,
+          "max": 13
+        },
+        "slot": "ELECTIVE",
+        "basket_published": false,
+        "count": 1,
+        "note": "single course, credit range"
+      }
+    ],
+    "3": [
+      {
+        "title": "Fundamentals of Data Engineering (Ops)",
+        "credits": 12
+      },
+      {
+        "title": "Operating Systems",
+        "credits": 13
+      },
+      {
+        "title": "Lab: Cloud Computing and Security",
+        "credits": 8
+      },
+      {
+        "title": "Lab: Vulnerability Assessment & Pen Testing",
+        "credits": 8
+      },
+      {
+        "title": "Departmental Elective",
+        "credits": 9,
+        "slot": "DE",
+        "basket_published": false
+      }
+    ],
+    "4": [
+      {
+        "title": "Introduction to Psychology",
+        "credits": 11
+      },
+      {
+        "title": "Computer Networks",
+        "credits": 9
+      },
+      {
+        "title": "2 courses from predefined list",
+        "credits": {
+          "each": 9,
+          "total": 18
+        },
+        "slot": "ELECTIVE",
+        "basket_published": false,
+        "count": 2
+      },
+      {
+        "title": "Lab: Network & Web Application Security",
+        "credits": 8
+      }
+    ],
+    "5-8": [
+      {
+        "title": "Internship",
+        "credits_per_semester": 54,
+        "note": "primarily at selected government organizations"
+      }
+    ]
+  }
+}

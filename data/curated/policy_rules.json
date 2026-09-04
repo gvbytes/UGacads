@@ -1,0 +1,192 @@
+{
+  "_comment": "Hand-transcribed from the sources named in each citation. Values are quoted, not inferred; verify against the cited section before changing one.",
+  "rules": [
+    {
+      "rule_id": "load.normal",
+      "scope": "UG",
+      "name": "Normal academic load",
+      "value_min": 50,
+      "value_max": 50,
+      "unit": "credits/semester",
+      "text": "Normal academic load is fifty credits per semester.",
+      "citation": "UG Manual 4.3.6.1",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "load.regular_range",
+      "scope": "UG",
+      "name": "Registrable range in a regular semester",
+      "value_min": 35,
+      "value_max": 65,
+      "unit": "credits/semester",
+      "text": "UG students may register for up to 30 percent less or more than the normal load, that is 35-65 credits, subject to DUGC approval of the registration form.",
+      "citation": "UG Manual 4.3.6.1",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "load.absolute_max",
+      "scope": "UG",
+      "name": "Maximum credits in a regular semester",
+      "value_min": null,
+      "value_max": 65,
+      "unit": "credits/semester",
+      "text": "Maximum credits (including Credits for External Activities) a student can register for in a regular semester is 65.",
+      "citation": "UG Manual 4.3.6.1",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "load.underload_min",
+      "scope": "UG",
+      "name": "Under-load minimum",
+      "value_min": 27,
+      "value_max": null,
+      "unit": "credits/semester",
+      "text": "Students identified as academically deficient may register for a minimum of 27 credits. Students in their final semester or on an extended degree may register below the minimum where only that many credits remain.",
+      "citation": "UG Manual 4.3.6.3",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "load.project_range",
+      "scope": "UG",
+      "name": "Credit limits when registering project credits",
+      "value_min": 35,
+      "value_max": 65,
+      "unit": "credits/semester",
+      "text": "For students registering for Project credits (with or without course), the credit limits will be 35 to 65.",
+      "citation": "UG Manual 4.3.6.2(d)",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "summer.max",
+      "scope": "UG",
+      "name": "Summer-term maximum",
+      "value_min": null,
+      "value_max": 27,
+      "unit": "credits/summer-term",
+      "text": "UG students may register for a maximum of 27 credits in the summer-term. The summer-term is not a regular semester.",
+      "citation": "UG Manual 4.3.6",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "summer.max_graduating",
+      "scope": "UG",
+      "name": "Summer-term maximum when graduating",
+      "value_min": null,
+      "value_max": 29,
+      "unit": "credits/summer-term",
+      "text": "Students expecting to complete requirements for graduation by the summer-term may register for a maximum of 29 credits.",
+      "citation": "UG Manual 4.3.6",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "cea.semester_max",
+      "scope": "UG",
+      "name": "Credits for External Activities per regular semester",
+      "value_min": null,
+      "value_max": 27,
+      "unit": "credits/semester",
+      "text": "A student may register up to 27 CEA credits in a regular semester and up to 9 credits in summer term; over the entire programme only 27 credits are allowed.",
+      "citation": "UG Manual 4.3.6.1",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "grad.institute_core_min",
+      "scope": "UG",
+      "name": "Institute Core minimum for graduation",
+      "value_min": 60,
+      "value_max": null,
+      "unit": "credits",
+      "text": "Institute Core (IC): a minimum of 60 credits acquired, subject to the batch-specific course conditions stated in the manual.",
+      "citation": "UG Manual, graduation requirements table",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "honours.cpi_min",
+      "scope": "PROGRAMME",
+      "name": "CPI required for an Honours programme",
+      "value_min": 8,
+      "value_max": null,
+      "unit": "CPI",
+      "text": "Departments state a CPI criterion of 8.0 for the BTH (Honours) variant of their B.Tech programme.",
+      "citation": "ME course template, BTH remarks",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "duration.max.BT",
+      "scope": "PROGRAMME",
+      "name": "Maximum duration, 4-year programmes",
+      "value_min": null,
+      "value_max": 12,
+      "unit": "semesters",
+      "text": "BT/BS/BTM/BSM/BTH/BSH: normal duration 8 semesters, minimum 7, maximum 12 for Y22 and later and for Y21 and earlier alike.",
+      "citation": "UG Manual 3.2, Minimum and Maximum Duration",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "duration.min.BT",
+      "scope": "PROGRAMME",
+      "name": "Minimum duration, 4-year programmes",
+      "value_min": 7,
+      "value_max": null,
+      "unit": "semesters",
+      "text": "BT/BS/BTM/BSM/BTH/BSH may not normally be completed in fewer than 7 semesters, though graduation may be claimed before the minimum residency.",
+      "citation": "UG Manual 3.2",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "duration.max.DUAL",
+      "scope": "PROGRAMME",
+      "name": "Maximum duration, Dual Degree",
+      "value_min": null,
+      "value_max": 15,
+      "unit": "semesters",
+      "text": "Dual Degree: normal duration 10 semesters, minimum 9, maximum 15.",
+      "citation": "UG Manual 3.2",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "duration.max.DOUBLE_MAJOR.Y22",
+      "scope": "PROGRAMME",
+      "name": "Maximum duration, Double Major (Y22 and later)",
+      "value_min": null,
+      "value_max": 15,
+      "unit": "semesters",
+      "text": "Double Major: normal duration 10 semesters, minimum 9, maximum 15 for Y22 and later.",
+      "citation": "UG Manual 3.2",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "duration.max.DOUBLE_MAJOR.Y21",
+      "scope": "PROGRAMME",
+      "name": "Maximum duration, Double Major (Y21 and earlier)",
+      "value_min": null,
+      "value_max": 12,
+      "unit": "semesters",
+      "text": "Double Major: maximum 12 semesters for Y21 and earlier, three fewer than for later batches.",
+      "citation": "UG Manual 3.2",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "minor.credits",
+      "scope": "UG",
+      "name": "Credits a Minor entails",
+      "value_min": 27,
+      "value_max": 44,
+      "unit": "credits",
+      "text": "A Minor entails the completion of 27-44 credits through specified courses within a discipline or programme.",
+      "citation": "UG Manual 7.4",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "minor.slots",
+      "scope": "UG",
+      "name": "Slots a Minor course may occupy",
+      "value_min": null,
+      "value_max": null,
+      "unit": null,
+      "text": "A student may take Minor courses in an OE, DE, ESO or SCHEME slot, as advised by the parent department's DUGC Convener. Minor courses therefore consume existing elective capacity rather than adding credits on top of the template.",
+      "citation": "UG Manual 7.4",
+      "confidence": "OBSERVED"
+    }
+  ]
+}

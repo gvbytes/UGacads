@@ -1,0 +1,17 @@
+{
+  "_comment": "Batch-gated programme options. Each entry quotes its source verbatim in 'text'.",
+  "rules": [
+    {"rule_id":"dis.minor.y26","programme_id":null,"option":"MINOR","department":"IS","batch_from":"Y26","batch_to":null,"eligible":true,
+     "text":"The Dual Degree, Minor, Double Major programme options in the Department of Intelligent Systems will be available only to students admitted to IIT Kanpur from the Academic Year 2026-27 onwards. Students admitted in earlier batches will not be eligible for these options.",
+     "citation":"https://iitk.ac.in/dis/minor-programme","confidence":"OBSERVED"},
+    {"rule_id":"dis.double_major.y26","programme_id":null,"option":"DOUBLE_MAJOR","department":"IS","batch_from":"Y26","batch_to":null,"eligible":true,
+     "text":"Same source and wording as dis.minor.y26; the restriction covers Dual Degree, Minor and Double Major together.",
+     "citation":"https://iitk.ac.in/dis/minor-programme","confidence":"OBSERVED"},
+    {"rule_id":"dis.dual_degree.y26","programme_id":null,"option":"DUAL_DEGREE","department":"IS","batch_from":"Y26","batch_to":null,"eligible":true,
+     "text":"Same source and wording as dis.minor.y26; the restriction covers Dual Degree, Minor and Double Major together.",
+     "citation":"https://iitk.ac.in/dis/minor-programme","confidence":"OBSERVED"},
+    {"rule_id":"bcyber.minor.none","programme_id":"BCYBER","option":"MINOR","department":null,"batch_from":"Y26","batch_to":null,"eligible":false,
+     "text":"B.Cyber semesters 5 to 8 are full-time internship carrying 54 credits each, leaving no elective capacity in which Minor coursework could be scheduled. Recorded as a structural consequence of the published curriculum, not as a separately published rule.",
+     "citation":"https://iitk.ac.in/wsais/b-cyber.php (Course Curriculum)","confidence":"DERIVED"}
+  ]
+}

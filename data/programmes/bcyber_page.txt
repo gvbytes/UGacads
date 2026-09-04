@@ -1,0 +1,231 @@
+Bachelors in Cybersecurity | WSAIS IIT Kanpur
+Wadhwani
+. -->
+Shortlisted Candidates Announced | Admission Test Details
+Bachelors in Cybersecurity (B.Cyber.)
+A new undergraduate program at IIT Kanpur
+Program run by the Wadhwani School of AI and Intelligent Systems
+IIT Madras launches the B.Cyber. program from academic year 2026-27.
+The admission to the program will be via the test being conducted by IIT Kanpur on 5th July 2026. Other details will be provided later.
+To know more Click here
+Notification
+B.Cyber Admissions 2026: Seat Allotment Announced – Click here to view. | List of Candidates for B.Cyber 2026 Announced - Click here to view.
+About Program
+Course Curriculum
+Eligibility & Fees
+Admissions & Timelines
+Selection & Policies
+FAQs
+Director's Address
+Dean's Message
+Prof. Nitin Saxena
+Dean
+Shape the future of technology with the IIT Kanpur Wadhwani School of AI and Intelligent Systems (WSAIS). Launched in 2025, WSAIS is thrilled to announce two groundbreaking, Senate-approved undergraduate programs debuting in July 2026: B.Tech. in Intelligent Systems (BTIS) and a Bachelor's in Cybersecurity (B.Cyber). We invite aspiring innovators to join these premier programs, master cutting-edge technologies, and build the secure, AI-driven global economy of tomorrow.
+Salient Features of the Program
+First 2 years of course work at IIT Kanpur
+Next 2 years of internship, primarily at selected government organizations (some stipend may be paid by the organizations during this period)
+Shortlisting based on JEE Main scores and evidence of prior work in cybersecurity, followed by a test at IIT Kanpur which will include an in-person hackathon.
+An IIT Kanpur degree and alumnus status for candidates completing the program successfully.
+Semester 1
+Introduction to Electronics
+14 credits
+Practical Ethics
+3 credits
+Fundamentals of computing
+14 credits
+Fundamentals of Data Engineering (Data)
+12 credits
+Lab: Malware analysis
+8 credits
+Semester 2
+Applied Cryptography
+9 credits
+Data Structures and Algorithms
+12 credits
+Computer Organization
+12 credits
+Lab: Digital Forensics
+8 credits
+Course from predefined list
+9 to 13 credits
+Semester 3
+Fundamentals of Data Engineering (Ops)
+12 credits
+Operating Systems
+13 credits
+Lab: Cloud Computing and Security
+8 credits
+Lab: Vulnerability Assessment & Pen Testing
+8 credits
+Departmental Elective
+9 credits
+Semester 4
+Introduction to Psychology
+11 credits
+Computer Networks
+9 credits
+2 courses from predefined list
+9+9 credits
+Lab: Network & Web Application Security
+8 credits
+Semesters 5 to 8
+Internship
+54 credits each semester
+Fees Structure
+Application Fees
+Female Candidates (All Categories): ₹1,600
+SC/ST/PwD Candidates: ₹1,600
+All Other Candidates: ₹3,200
+Program Fee
+Same as for regular students of IIT Kanpur
+Click here for more information
+Eligibility Criteria
+Academic Criteria
+Class 12th or equivalent. Physics, Chemistry, and Mathematics in 12th standard; and must have taken 5 subjects in this standard.
+Age Criteria
+Candidates should have been born on or after October 1, 2001 .
+Relaxation: Five years age relaxation is given to SC, ST, and PwD candidates, i.e. these candidates should have been born on or after October 1, 1996 .
+Open Schooling
+Candidates from NIOS (National Institute of Open Schooling) are eligible.
+Citizenship Criteria
+Only Indian nationals are eligible for the program.
+Other Important Criteria
+Number of Attempts
+A candidate can apply to this program a maximum of two times, and these two applications must only be in consecutive years.
+Earlier/Concurrent admission at IITs
+To prevent a candidate from taking up the seat in two different programs in the current year, as well as to prevent a student from being enrolled in any other program at the same time.
+Further, as per the eligibility criteria for applying to the B.Cyber. program 2026, the following is stated:
+"A candidate should NOT have been admitted to an IIT under any academic program that is listed in JoSAA Business Rules of 2025, irrespective of whether or not the candidate continued in the program OR accepted an IIT seat by reporting "online" / at a "reporting centre" in the past."
+"Candidates whose admission to IITs was cancelled (for whatever reason) after joining any IIT are also NOT eligible to apply for the B.Cyber. program 2026."
+Candidates who have been admitted to a preparatory course in any of the IITs for the first time in 2025 can apply for the B.Cyber. program 2026.
+"The candidates who were allocated a seat in an IIT through JoSAA 2025 but (i) did not report "online" / at any "reporting centre" OR, (ii) withdrew before the last round of seat allotment, OR, (iii) had their seat cancelled (for whatever reason) before the last round of seat allotment for IITs, are eligible to apply for the B.Cyber. program 2026."
+Tentative Timeline
+Portal launch and application form opening
+15th June 2026
+Last date to apply
+25th June 2026
+Intimation to shortlisted candidates
+28th June 2026
+Admission test
+5th July 2026
+IIT Kanpur Campus
+Announcement of results
+Wednesday, 8th July 2026
+Selected candidates to report to IIT Kanpur
+21st July 2026
+Important Update
+Information regarding the shortlisting process, application fee, and other admission-related updates.
+Read More
+IIT Madras launches the B.Cyber. program from academic year 2026-27.
+The admission to the program will be via the test being conducted by IIT Kanpur on 5th July 2026. Other details will be provided later.
+To know more Click here
+Shortlisted Candidates for Admission Test
+Click here
+Details of Admission Test
+Syllabus of the Admission Test / Hackathon
+Cryptography
+Web Security
+API Security
+Network Security
+Reverse Engineering
+OSINT
+The test will assess a candidate's analytical thinking, curiosity, and aptitude for cybersecurity. It will be conducted on sanitized desktop systems and monitored by a team of IIT Kanpur experts throughout the duration of the test.
+*Important Instructions: Click here
+Test Schedule & Venue
+Date: 05 July 2026
+Venue: New Core Lab, IIT Kanpur, Kanpur, UP – 208016
+Venue Google Map: Click here
+Reporting Time: 9:00 AM
+Entry Closes: 9:45 AM (No entry thereafter)
+Instructions/Login: By 10:00 AM
+Test Duration: 10:00 AM – 4:00 PM
+Working lunch (packed vegetarian meal) and drinking water will be provided. Candidates with special dietary requirements may bring their own food in a clearly marked transparent container.
+List of Candidates for B.Cyber 2026
+Click here
+Seat Allotment for B.Cyber Admissions 2026
+Click here
+Shortlisting and selection process
+The shortlisting will be done on the basis of the best JEE Mains score of any session of 2025 or 2026 of the candidates and evidence of any prior work done in the domain of cybersecurity.
+Tie-breaking rule: Same score – younger candidate will be considered.
+The shortlisting criteria will be decided by the admission committee. The decision of the admission committee will be final.
+Click here to view the detailed shortlisting criteria.
+Important Update
+Information regarding the shortlisting process, application fee, and other admission-related updates.
+Read More
+IIT Madras launches the B.Cyber. program from academic year 2026-27.
+The admission to the program will be via the test being conducted by IIT Kanpur on 5th July 2026. Other details will be provided later.
+To know more Click here
+Exit Options
+Certificate in Cybersecurity
+Permitted exit upon successful completion of:
+150 Credits
+Diploma in Cybersecurity
+Permitted exit upon successful completion of:
+200 Credits
+Maximum duration of the course
+Students need to complete the program within a maximum duration of 6 years.
+An extension of at most 1 year is permissible in the course work (1st and 2nd years of the curriculum), and an extension of at most 1 year is permissible in completing the internship (3rd and 4th year of the curriculum).
+Placement support
+Placement support will be provided to the candidates who successfully complete the program.
+Note: This program is meant only for students with a background and a deep interest in Cybersecurity. Other students may find the program challenging.
+Frequently Asked Questions (FAQ)
+1. What is the Bachelors in Cybersecurity (B.Cyber.) program?
+Details of the program are available on the website.
+2. Why has IIT Kanpur introduced this program?
+Watch the Director's Address for the vision behind the program: https://iitk.ac.in/wsais/b-cyber.php
+3. What is the eligibility criteria?
+Please refer to the Eligibility & Fees section on the B.Cyber webpage
+4. What is the curriculum of the program?
+Please refer to the Course Curriculum section on the B.Cyber webpage
+5. Is the curriculum approved by the IIT Kanpur Senate?
+Yes.
+6. How are the faculty members in WSAIS?
+WSAIS has a highly qualified faculty with expertise spanning cybersecurity, artificial intelligence, machine learning, algorithms, robotics, control systems, optimisation, computer vision, data science, software systems, and intelligent decision-making.
+Faculty profiles are available at: https://iitk.ac.in/wsais/faculty.php
+7. What kind of learning experience can students expect?
+Students will receive rigorous academic training through courses in computing, data engineering, operating systems, cloud computing, cybersecurity, and related areas. The program also includes extensive hands-on laboratory work and a two-year internship component that provides real-world experience in addressing cybersecurity challenges.
+8. How will placements compare with other undergraduate programs at IIT Kanpur?
+It is premature to comment on this at this stage. However, we expect that good students from the program will get hired in relevant industries/govt. Organizations.
+9 . What opportunities are available for higher studies?
+The B.Cyber. Degree will be equivalent to any regular 4-year degree of the institute and hence the students can certainly go for higher studies anywhere, including applying for Masters/PhD program at IITK itself.
+10 . Is there any early exit option available?
+Yes.
+Certificate in Cybersecurity
+Permitted exit upon successful completion of 150 credits.
+Diploma in Cybersecurity
+Permitted exit upon successful completion of 200 credits.
+11. What are the program fees?
+The fee structure is the same as that applicable to regular students of IIT Kanpur.
+For details, please refer to:
+https://www.iitk.ac.in/dosa/data/Fee-Structure-2026-27-First-New-Students-18-03-26.pdf
+12. Can students change their branch?
+No. The entry to BTech programs is through JEE Advanced. Therefore B.Cyber. Students can’t change to other programs. (Even BTech students can’t enter B.Cyber. program without qualifying the separate entrance test for this program.)
+13. Can students participate in placements along with students from other departments?
+No. Placement support will be provided by calling relevant organisations working in the domain of Cybersecurity.
+14. Will students receive a stipend during the internship period?
+Yes, most of them will get stipends. The amount may vary as per the policies of the organizations. It is also possible that some organizations may not provide any stipend. The institute will try its best to send students to only those organizations where some support is provided.
+15. Which cybersecurity domains will students study?
+The curriculum details are already available on the website.
+16. What degree will students receive upon successful completion of the program?
+Students who successfully complete all program requirements will be awarded a Bachelors in Cybersecurity (B.Cyber.) degree from IIT Kanpur.
+17. Will graduates receive IIT Kanpur alumni status?
+Yes. Students who successfully complete the program will receive IIT Kanpur alumni status.
+18. Who should apply for this program?
+The program is designed for highly motivated students who have a strong interest in cybersecurity, ethical hacking, secure systems, digital infrastructure, and solving real-world security challenges.
+19. Will students be considered regular IIT Kanpur students during the internship period?
+Yes, the students will be considered regular students of IITK for the entire duration of their degree.
+20. Will hostel accommodation be available for students enrolled in the B.Cyber. program?
+Yes, the students of B.Cyber. will be treated as any other student of IITK.
+21. Are candidates who appeared only for JEE Main Paper 2 (B.Arch./B.Planning) or candidates without Mathematics in Class XII eligible for admission?
+No. Such candidates are not eligible for admission to the B.Cyber. program.
+Please refer to the Eligibility Criteria section for detailed requirements.
+22. What qualifies as evidence of prior work in the domain of cybersecurity?
+This will include, but not limited to, reported vulnerabilities by candidates, cybersecurity projects/products developed by them,, open-source contributions to cybersecurity projects, or other relevant accomplishments. The criticality and technical details of the vulnerabilities disclosed by them will be considered during the shortlisting. The candidate will have to provide easily verifiable evidence of the work done.
+23 . Will the same admission process be followed for future admissions?
+JEE Mains will not be used. A separate entrance test will be announced, the details of which will be made available soon.
+24 . What is the syllabus of the admission test/hackathon?
+The hackthon/test will consist of challenges related to Web Security, API Security, OSINT, Reverse Engineering, Operating Systems (Linux and Windows), cloud security. Malware and threat analysis, and reverse engineering. The test will focus on assessing a candidate's analytical thinking, curiosity, and aptitude for cybersecurity. The test will be conducted on desktops sanitized for, and monitored by, a team of IIT Kanpur experts throughout the duration of the test
+25 . Is the application fee refundable?
+No. The application fee is non-refundable and non-transferable under any circumstances.
+26 . What should I do if I belong to the EWS/OBC-NCL category but do not currently have a valid category certificate?
+Candidates who do not currently possess a valid category certificate may submit the prescribed undertaking during application. Any admission offer will remain provisional until submission of the required certificate as per IIT Kanpur guidelines. Then, provide the Undertaking Link .
