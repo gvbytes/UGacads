@@ -85,6 +85,25 @@ class Catalogue:
     prereq_meta: dict[str, dict] = field(default_factory=dict)
     policy: dict[str, dict] = field(default_factory=dict)
     eligibility: list[dict] = field(default_factory=list)
+    aliases: dict[str, tuple[str, str]] = field(default_factory=dict)  # old -> (new, method)
+
+    def resolve_code(self, code: str) -> tuple[str | None, str | None]:
+        """Map a course code a student typed onto the code the catalogue uses.
+
+        Transcripts of students admitted under the old UGARC carry codes the current
+        schedules no longer print, and some of the changes are renumberings that no
+        structural rule can derive: PHY102A became PHY112. Returns the resolved code and
+        the method, or (None, None) when the code is unknown.
+        """
+        code = (code or "").strip().upper()
+        if not code:
+            return None, None
+        if code in self.courses:
+            return code, None
+        hit = self.aliases.get(code)
+        if hit:
+            return hit[0], hit[1]
+        return None, None
     aliases: dict[str, str] = field(default_factory=dict)   # spelling -> course code
     master: dict[str, dict] = field(default_factory=dict)   # every approved course
 
@@ -327,6 +346,9 @@ def load(db_path: str) -> Catalogue:
                 "branch": r["branch"], "title": r["title"],
                 "discontinued": bool(r["discontinued"]),
             }
+
+        for r in conn.execute("SELECT from_code, to_code, method FROM code_alias"):
+            cat.aliases[r["from_code"]] = (r["to_code"], r["method"])
 
         for r in conn.execute("SELECT * FROM policy_rule"):
             cat.policy[r["rule_id"]] = dict(r)

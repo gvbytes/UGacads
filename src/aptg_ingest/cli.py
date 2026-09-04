@@ -74,6 +74,14 @@ def build(data_dir: Path, q: Quarantine) -> Dataset:
         ds.template_slots.extend(slots)
 
     master_pdf = data_dir / "policy" / "approved_course_master.pdf"
+    senate_aliases: dict[str, str] = {}
+    department_rules: list[dict] = []
+    mapping_path = data_dir / "curated" / "course_mapping_ugarc.json"
+    if mapping_path.exists():
+        mapping = json.loads(mapping_path.read_text())
+        senate_aliases = {a["from"]: a["to"] for a in mapping.get("aliases", [])}
+        department_rules = mapping.get("department_rules", [])
+
     aliases: dict[str, str] = {}
     if master_pdf.exists():
         ds.course_master = parse_master(str(master_pdf), q)
@@ -94,6 +102,8 @@ def build(data_dir: Path, q: Quarantine) -> Dataset:
     # resolves the same way in a template, a prerequisite and a minor basket alike.
     resolver = Resolver(
         {c.code for c in ds.courses if c.code},
+        senate_aliases=senate_aliases,
+        department_rules=department_rules,
         title_aliases=aliases,
         course_titles={c.code: c.title for c in ds.courses if c.code},
         master_titles={r.code: r.title for r in ds.course_master},
@@ -303,6 +313,8 @@ def resolve_codes(ds: Dataset, q: Quarantine, aliases: dict[str, str] | None = N
 
     resolver = resolver or Resolver(
         known,
+        senate_aliases=senate_aliases,
+        department_rules=department_rules,
         title_aliases=aliases,
         course_titles={c.code: c.title for c in ds.courses if c.code},
         master_titles={r.code: r.title for r in ds.course_master},

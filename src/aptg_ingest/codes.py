@@ -81,9 +81,11 @@ class Resolver:
     """
 
     def __init__(self, known, title_aliases=None, course_titles=None, master_titles=None,
-                 on_veto=None):
+                 on_veto=None, senate_aliases=None, department_rules=None):
         self.known = set(known)
         self.index = build_index(self.known)
+        self.senate_aliases = dict(senate_aliases or {})
+        self.department_rules = list(department_rules or [])
         self.title_aliases = dict(title_aliases or {})
         self.course_titles = dict(course_titles or {})
         self.master_titles = dict(master_titles or {})
@@ -93,8 +95,19 @@ class Resolver:
     def resolve(self, code: str) -> str | None:
         if code in self.known:
             return code
-        hit = self.title_aliases.get(code)
-        method = "TITLE_MATCH"
+        # A Senate-approved mapping outranks anything inferred. It is the only source
+        # that can state a renumbering the codes themselves do not reveal, such as
+        # PHY102A becoming PHY112, and the only one that can correct an inference that
+        # would otherwise be plausible and wrong, such as MSE497A -> MSE497.
+        hit = self.senate_aliases.get(code)
+        method = "SENATE"
+        if hit is not None and hit not in self.known:
+            hit = None
+        if hit is None:
+            hit, method = self._department_rule(code), "SENATE_DEPT"
+        if hit is None:
+            hit = self.title_aliases.get(code)
+            method = "TITLE_MATCH"
         if hit is None:
             hit, method = resolve(code, self.known, self.index), "STEM"
             if hit is not None and self._conflicts(code, hit):
@@ -106,6 +119,26 @@ class Resolver:
         if hit and hit != code:
             self.used[code] = (hit, method)
         return hit
+
+    def _department_rule(self, code: str) -> str | None:
+        """Apply a department-wide renumbering, e.g. IMExyzA -> DMSxyz.
+
+        Only used when the resulting code actually exists, so a rule stated in general
+        terms never invents a course.
+        """
+        for rule in self.department_rules:
+            pre, to, suf = rule["from_prefix"], rule["to_prefix"], rule.get("requires_suffix", "")
+            if not code.startswith(pre):
+                continue
+            rest = code[len(pre):]
+            if suf and not rest.endswith(suf):
+                continue
+            if suf:
+                rest = rest[: -len(suf)]
+            candidate = to + rest
+            if candidate in self.known:
+                return candidate
+        return None
 
     def _conflicts(self, code: str, hit: str) -> bool:
         from .parse_master import titles_conflict

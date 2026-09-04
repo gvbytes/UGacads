@@ -1,0 +1,62 @@
+{
+  "_comment": [
+    "Course mappings approved by the Senate for the Old UGARC to New UGARC transition,",
+    "transcribed from data/policy/course_mapping_ugarc.pdf (DOAA, Course_mapping_data.pdf).",
+    "",
+    "Only the mappings that structural inference cannot derive, or would derive wrongly,",
+    "are listed here. A plain suffix drop such as AE641A -> AE641 is already handled by",
+    "the stem rule in aptg_ingest.codes and is not repeated.",
+    "",
+    "Three kinds appear:",
+    "",
+    "  renumbered  - the course number itself changed, so the codes share no stem and no",
+    "                structural rule can connect them. PHY102A became PHY112.",
+    "",
+    "  corrected   - the stem rule would produce an answer, and it would be the wrong",
+    "                one. MSE497A maps to MSE498, not to MSE497 -- and MSE497 exists",
+    "                separately as the new code for MSE398A. Inferring here would",
+    "                silently credit a student for a course they did not take.",
+    "",
+    "  department  - a whole department renumbered. IMExyzA is equivalent to DMSxyz,",
+    "                stated in general terms in the Senate letter and applied as a rule",
+    "                rather than enumerated.",
+    "",
+    "One-to-many mappings, where a legacy course maps to a choice or a combination of",
+    "new ones, are not aliases and live in course_equivalences.json instead.",
+    "",
+    "These matter for students admitted in Y21 and earlier, whose transcripts carry the",
+    "old codes. Without them a Y21 student entering PHY102A is told the course is",
+    "unknown, and the requirement it satisfies is scheduled again."
+  ],
+  "citation": "Senate meeting 2023-24/5th (564th), 06-07 June 2024, and SUGC 2024-25/4th-8th; DOAA Course_mapping_data.pdf",
+  "aliases": [
+    {"from": "PHY101A", "to": "PHY111", "kind": "renumbered"},
+    {"from": "PHY102A", "to": "PHY112", "kind": "renumbered"},
+    {"from": "PHY103A", "to": "PHY113", "kind": "renumbered"},
+    {"from": "PHY473A", "to": "PHY617", "kind": "renumbered"},
+
+    {"from": "MSE349A", "to": "MSE496", "kind": "renumbered", "note": "UGP-1"},
+    {"from": "MSE398A", "to": "MSE497", "kind": "renumbered", "note": "UGP-2"},
+    {"from": "MSE497A", "to": "MSE498", "kind": "corrected",
+     "note": "UGP-3. The stem rule would give MSE497, which is the new code for MSE398A."},
+    {"from": "MSE449A", "to": "MSE499", "kind": "renumbered", "note": "UGP-4"},
+
+    {"from": "MTH392A", "to": "MTH497", "kind": "renumbered", "note": "UGP-2"},
+    {"from": "MTH393A", "to": "MTH498", "kind": "renumbered", "note": "UGP-3"},
+    {"from": "MTH394A", "to": "MTH499", "kind": "renumbered", "note": "UGP-4"},
+
+    {"from": "CHE398A", "to": "CHE496", "kind": "renumbered"},
+
+    {"from": "IME701A", "to": "DMS661", "kind": "renumbered"},
+    {"from": "IME702A", "to": "DMS662", "kind": "renumbered"}
+  ],
+  "department_rules": [
+    {
+      "from_prefix": "IME",
+      "to_prefix": "DMS",
+      "requires_suffix": "A",
+      "text": "In general, IMExyzA is equivalent to DMSxyz, while MBAxyz remains unchanged.",
+      "note": "Applied only where the resulting DMS code exists in the course table, and only after the explicit aliases above, which override it."
+    }
+  ]
+}

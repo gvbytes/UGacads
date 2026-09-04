@@ -6,8 +6,8 @@
     "two modular courses taken together.",
     "",
     "Why this file has to exist. The Pingala prerequisite strings write the whole family",
-    "as a flat alternation — ESO207 reads '( ESC101A OR ESC111M OR ESC112M OR ESC113M )'",
-    "— which says any one of the four suffices. That is wrong: a student on the new",
+    "as a flat alternation \u2014 ESO207 reads '( ESC101A OR ESC111M OR ESC112M OR ESC113M )'",
+    "\u2014 which says any one of the four suffices. That is wrong: a student on the new",
     "structure must take ESC111 *and* one of ESC112/ESC113. Read literally, the engine",
     "would let a single 7-credit module unlock the whole CSE chain.",
     "",
@@ -16,7 +16,7 @@
     "remainder is ANDed with `expression`. On ESO207 the remainder is empty, so the",
     "result is the equivalence itself. On CS340, '( ESC101A OR ESC111M AND ESC112M OR",
     "ESC113M AND ESO207 OR ESO207A )' leaves 'ESO207 OR ESO207A', which is ANDed with the",
-    "computing requirement — the reading the department intends. The original string is",
+    "computing requirement \u2014 the reading the department intends. The original string is",
     "kept in expr_raw and the mechanical parse in expr_ast, so nothing is lost.",
     "",
     "Codes are written as the sources print them and are resolved against the course",
@@ -27,20 +27,37 @@
       "equivalence_id": "esc101.modularised",
       "name": "Fundamentals of Computing, modularised",
       "legacy_code": "ESC101A",
-      "members": ["ESC101A", "ESC111M", "ESC112M", "ESC113M"],
+      "members": [
+        "ESC101A",
+        "ESC111M",
+        "ESC112M",
+        "ESC113M"
+      ],
       "expression": {
         "op": "OR",
         "args": [
-          {"op": "COURSE", "code": "ESC101A"},
+          {
+            "op": "COURSE",
+            "code": "ESC101A"
+          },
           {
             "op": "AND",
             "args": [
-              {"op": "COURSE", "code": "ESC111M"},
+              {
+                "op": "COURSE",
+                "code": "ESC111M"
+              },
               {
                 "op": "OR",
                 "args": [
-                  {"op": "COURSE", "code": "ESC112M"},
-                  {"op": "COURSE", "code": "ESC113M"}
+                  {
+                    "op": "COURSE",
+                    "code": "ESC112M"
+                  },
+                  {
+                    "op": "COURSE",
+                    "code": "ESC113M"
+                  }
                 ]
               }
             ]
@@ -55,16 +72,187 @@
       "equivalence_id": "eso207.cs210",
       "name": "Data Structures and Algorithms under two codes",
       "legacy_code": "CS210",
-      "members": ["CS210", "CS210A", "ESO207", "ESO207A"],
+      "members": [
+        "CS210",
+        "CS210A",
+        "ESO207",
+        "ESO207A"
+      ],
       "expression": {
         "op": "OR",
         "args": [
-          {"op": "COURSE", "code": "ESO207"},
-          {"op": "COURSE", "code": "CS210"}
+          {
+            "op": "COURSE",
+            "code": "ESO207"
+          },
+          {
+            "op": "COURSE",
+            "code": "CS210"
+          }
         ]
       },
       "text": "Data Structures and Algorithms is published as ESO207/ESO207A in the institute core basket and as CS210/CS210A in the CSE department's own numbering. They are one requirement, satisfied by either. The two codes share no stem, so the structural aliasing rule cannot connect them, and the variant-grouping rule read the Pingala string for CS425 as requiring both at once.",
       "citation": "IITK_Minor_Courses_Catalogue.md, Computer Science and Engineering: \"ESO207A (Data Structures & Algorithms, 12 credits) or equivalent CS210 is mandatory across all 4 streams.\"",
+      "confidence": "OBSERVED"
+    },
+    {
+      "equivalence_id": "ce451.split",
+      "name": "CE451A replaced by a choice of two courses",
+      "legacy_code": "CE451A",
+      "members": [
+        "CE451A",
+        "CE633",
+        "CE630"
+      ],
+      "expression": {
+        "op": "OR",
+        "args": [
+          {
+            "op": "COURSE",
+            "code": "CE451A"
+          },
+          {
+            "op": "COURSE",
+            "code": "CE633"
+          },
+          {
+            "op": "COURSE",
+            "code": "CE630"
+          }
+        ]
+      },
+      "text": "CE451A [11] under Old UGARC maps to CE633 [9] or CE630 [9] under New UGARC. Either new course discharges the legacy requirement, so this is a choice rather than a rename and cannot be expressed as an alias.",
+      "citation": "Senate meeting 2023-24/5th (564th); DOAA Course_mapping_data.pdf",
+      "confidence": "OBSERVED"
+    },
+    {
+      "equivalence_id": "ce471.split",
+      "name": "CE471A replaced by a choice of three courses",
+      "legacy_code": "CE471A",
+      "members": [
+        "CE471A",
+        "CE620",
+        "CE621",
+        "CE723"
+      ],
+      "expression": {
+        "op": "OR",
+        "args": [
+          {
+            "op": "COURSE",
+            "code": "CE471A"
+          },
+          {
+            "op": "COURSE",
+            "code": "CE620"
+          },
+          {
+            "op": "COURSE",
+            "code": "CE621"
+          },
+          {
+            "op": "COURSE",
+            "code": "CE723"
+          }
+        ]
+      },
+      "text": "CE471A [11] under Old UGARC maps to CE620 [9], CE621 [9] or CE723 [9] under New UGARC.",
+      "citation": "Senate meeting 2023-24/5th (564th); DOAA Course_mapping_data.pdf",
+      "confidence": "OBSERVED"
+    },
+    {
+      "equivalence_id": "ce481.pair",
+      "name": "CE481A replaced by two modules taken together",
+      "legacy_code": "CE481A",
+      "members": [
+        "CE481A",
+        "CE788M",
+        "CE785M"
+      ],
+      "expression": {
+        "op": "OR",
+        "args": [
+          {
+            "op": "COURSE",
+            "code": "CE481A"
+          },
+          {
+            "op": "AND",
+            "args": [
+              {
+                "op": "COURSE",
+                "code": "CE788M"
+              },
+              {
+                "op": "COURSE",
+                "code": "CE785M"
+              }
+            ]
+          }
+        ]
+      },
+      "text": "CE481A [11] under Old UGARC maps to CE788M [5] and CE785M [5] under New UGARC \u2014 both modules, not either. The Senate letter writes the pair with '&', in contrast to the '/' used for the CE451A and CE471A choices.",
+      "citation": "Senate meeting 2023-24/5th (564th); DOAA Course_mapping_data.pdf",
+      "confidence": "OBSERVED"
+    },
+    {
+      "equivalence_id": "ime697.either",
+      "name": "IME697A under either department code",
+      "legacy_code": "IME697A",
+      "members": [
+        "IME697A",
+        "IME697",
+        "DMS697"
+      ],
+      "expression": {
+        "op": "OR",
+        "args": [
+          {
+            "op": "COURSE",
+            "code": "IME697A"
+          },
+          {
+            "op": "COURSE",
+            "code": "IME697"
+          },
+          {
+            "op": "COURSE",
+            "code": "DMS697"
+          }
+        ]
+      },
+      "text": "IME697A [0] maps to IME697 [0] or DMS697 [0]. The department renumbering to DMS left both codes in use for this course, so neither alone is the canonical successor.",
+      "citation": "Senate meeting 2023-24/5th (564th); DOAA Course_mapping_data.pdf",
+      "confidence": "OBSERVED"
+    },
+    {
+      "equivalence_id": "ime611.either",
+      "name": "IME611A under either department code",
+      "legacy_code": "IME611A",
+      "members": [
+        "IME611A",
+        "IME611",
+        "DMS611"
+      ],
+      "expression": {
+        "op": "OR",
+        "args": [
+          {
+            "op": "COURSE",
+            "code": "IME611A"
+          },
+          {
+            "op": "COURSE",
+            "code": "IME611"
+          },
+          {
+            "op": "COURSE",
+            "code": "DMS611"
+          }
+        ]
+      },
+      "text": "IME611A [11] maps to DMS611 [11] or IME611 [11].",
+      "citation": "Senate meeting 2023-24/5th (564th); DOAA Course_mapping_data.pdf",
       "confidence": "OBSERVED"
     }
   ],
@@ -73,12 +261,12 @@
     "against the data held here, recorded so their absence is deliberate rather than an",
     "oversight. Each is emitted as a policy rule, not as a course rewrite.",
     "",
-    "* MTH101 split into MTH101M1/M2 and MTH102 into MTH102M1/M2 — the schedule exports",
+    "* MTH101 split into MTH101M1/M2 and MTH102 into MTH102M1/M2 \u2014 the schedule exports",
     "  carry only MTH101A and MTH102A, so there is nothing to rewrite.",
-    "* CHM102 split into two modules — only CHM102A appears.",
+    "* CHM102 split into two modules \u2014 only CHM102A appears.",
     "* PHY102/PHY103 replaced by four full-semester Physics courses of which a department",
-    "  chooses two — none of the four appears under a distinct code.",
-    "* TA201 and TA202 moved into the E/SO basket — a slot-type change per template, and",
+    "  chooses two \u2014 none of the four appears under a distinct code.",
+    "* TA201 and TA202 moved into the E/SO basket \u2014 a slot-type change per template, and",
     "  the templates held here already carry their own slot types.",
     "* ESO/SO/CSO/MSO/PSO/HSO consolidated into ESO and SO."
   ],

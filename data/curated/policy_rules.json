@@ -187,6 +187,50 @@
       "text": "A student may take Minor courses in an OE, DE, ESO or SCHEME slot, as advised by the parent department's DUGC Convener. Minor courses therefore consume existing elective capacity rather than adding credits on top of the template.",
       "citation": "UG Manual 7.4",
       "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "minor.no_cpi_criterion",
+      "scope": "UG",
+      "name": "No CPI criterion for a Minor",
+      "value_min": null,
+      "value_max": null,
+      "unit": null,
+      "text": "There is no CPI criterion to apply for Minors. Allotment of Minor(s) is based only on the availability of seats.",
+      "citation": "UG Manual 7.4.1(e)",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "minor.not_own_department",
+      "scope": "UG",
+      "name": "A Minor may not be in the student's own department",
+      "value_min": null,
+      "value_max": null,
+      "unit": null,
+      "text": "All UG students can apply for Minor(s) in any department except their own. Double Major students are additionally excluded from the department of their second major, and Dual Degree students from their PG department.",
+      "citation": "UG Manual 7.4.1(a)-(d)",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "minor.multiple_allowed",
+      "scope": "UG",
+      "name": "More than one Minor is permitted",
+      "value_min": null,
+      "value_max": 3,
+      "unit": "minors per application cycle",
+      "text": "A student may complete more than one Minor. Each student may apply for a maximum of three minors in each application cycle, at the end of the 4th, 5th and 6th semester.",
+      "citation": "UG Manual 7.4.1(g), 7.4.2(a)-(c)",
+      "confidence": "OBSERVED"
+    },
+    {
+      "rule_id": "minor.seat_cap",
+      "scope": "UG",
+      "name": "Seats available in a Minor",
+      "value_min": null,
+      "value_max": null,
+      "unit": "students per year",
+      "text": "Where the first course of a Minor is a compulsory departmental course, the department admits at least the smaller of 10 students or 20 percent of its batch strength. Where it is not, the department admits up to 20 percent of its batch strength. Allotment is by seat availability alone, so scheduling a Minor course never guarantees admission to the Minor.",
+      "citation": "UG Manual 7.4.6",
+      "confidence": "OBSERVED"
     }
   ]
 }

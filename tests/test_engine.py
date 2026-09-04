@@ -332,6 +332,32 @@ def test_an_unfillable_basket_names_the_constraint_responsible(engine):
     assert any("prerequisite not met" in u.blocked_reason for u in blocked)
 
 
+def test_a_packing_extension_is_distinguished_from_a_capacity_shortfall(engine):
+    """An overrun has two causes and the student needs to know which.
+
+    At a 50-credit ceiling the ME profile needs 147 credits across three semesters that
+    would hold 150, so the total is not the problem. Almost every open elective on offer
+    is a nine-credit course, so a semester admits five of them and never six; the last
+    nine credits cannot be packed. The engine must say that rather than reporting only
+    the later graduation semester.
+    """
+    rm = engine.solve(me_student(), Preferences(max_credits=50, target_semesters=8))
+    assert rm.verdict == FEASIBLE_WITH_ADJUSTMENT
+    assert any("not the problem" in line for line in rm.log)
+    assert any(f.kind == "packing_extension" for f in rm.risks)
+
+
+def test_the_ceiling_that_removes_an_extension_is_named_and_correct(engine):
+    rm = engine.solve(me_student(), Preferences(max_credits=50, target_semesters=8))
+    named = [line for line in rm.log if "Raising the per-semester ceiling" in line]
+    assert named, "the plan should name a ceiling that works"
+    ceiling = int(named[0].split("ceiling to ")[1].split()[0])
+    # The figure is a promise to the student, so verify it actually holds.
+    check = engine.solve(me_student(), Preferences(max_credits=ceiling, target_semesters=8))
+    assert check.verdict == FEASIBLE
+    assert check.graduation_semester <= 8
+
+
 # --- explainability ---------------------------------------------------------
 
 def test_every_placement_carries_a_reason(engine):

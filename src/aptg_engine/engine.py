@@ -587,11 +587,48 @@ class Engine:
                     + "."
                 )
 
+        # A transcript may be written in codes the current catalogue no longer uses.
+        # Resolve them before anything else, so an old-UGARC student is credited for
+        # what they actually passed instead of being told to take it again.
+        translated: list[str] = []
+        unknown: list[str] = []
+        resolved: set[str] = set()
+        for raw in sorted(profile.completed):
+            code, method = cat.resolve_code(raw)
+            if code is None:
+                unknown.append(raw)
+                continue
+            resolved.add(code)
+            if code != raw:
+                translated.append(f"{raw} -> {code}")
+        profile = replace(profile, completed=resolved)
+
         prog = cat.programmes.get(profile.programme_id)
         if prog is None:
             rm.verdict = INFEASIBLE
             rm.summary = f"Unknown programme {profile.programme_id}."
             return rm
+
+        if translated:
+            rm.log.append(
+                f"{len(translated)} completed course(s) were recorded under codes the "
+                f"current catalogue no longer uses and were mapped to their successors: "
+                + ", ".join(translated[:8])
+                + (" and others" if len(translated) > 8 else "")
+                + "."
+            )
+        if unknown:
+            rm.risks.append(
+                RiskFlag(
+                    "MEDIUM",
+                    "unknown_completed_code",
+                    f"{len(unknown)} completed course(s) could not be matched to any "
+                    f"course in the catalogue ({', '.join(unknown[:6])}"
+                    + (" and others" if len(unknown) > 6 else "")
+                    + "); they were ignored, so a requirement they satisfy may be "
+                    "scheduled again.",
+                )
+            )
 
         ceiling = min(prefs.max_credits, cat.policy["load.absolute_max"]["value_max"])
         manual_max, duration_rule = self._max_duration(profile)
@@ -1228,6 +1265,76 @@ class Engine:
                 best_key, best = key, cand
         return best
 
+    def _explain_extension(self, rm, profile: StudentProfile, prefs: Preferences) -> None:
+        """Say why the plan overran, and name the ceiling that would prevent it.
+
+        An extension has two quite different causes and a student needs to know which.
+        Either the work genuinely does not fit in the remaining semesters, or it would
+        fit on total credits but cannot be packed because courses are indivisible. The
+        second case is the common one at IIT Kanpur, where almost every open elective is
+        a nine-credit course: a fifty-credit ceiling admits five of them per semester,
+        never six, so two semesters hold ninety credits of electives however they are
+        arranged.
+
+        Reporting only "completes in semester 9" leaves the student to guess. Naming the
+        smallest ceiling that avoids the overrun turns it into a decision they can make.
+        """
+        placed = sum(rm.credits_per_semester.values())
+        span = prefs.target_semesters - max(1, profile.current_semester) + 1
+        if span < 1:
+            return
+        capacity = prefs.max_credits * span
+        overflow = sum(
+            c for s, c in rm.credits_per_semester.items() if s > prefs.target_semesters
+        )
+        if overflow <= 0:
+            return
+
+        if placed > capacity:
+            rm.log.append(
+                f"The extension is a capacity shortfall: {placed} credits remain and "
+                f"{span} semesters at {prefs.max_credits} credits hold only {capacity}."
+            )
+            return
+
+        # Total credits fit; the overrun is a packing effect. Find the lowest ceiling
+        # that removes it, so the student is told what would actually work.
+        rm.log.append(
+            f"{placed} credits remain and {span} semesters at {prefs.max_credits} "
+            f"credits would hold {capacity}, so the total is not the problem. The "
+            f"overrun is caused by course sizes: {overflow} credits could not be packed "
+            f"into the remaining semesters without exceeding the ceiling."
+        )
+        fix = self._minimum_ceiling(profile, prefs)
+        if fix:
+            rm.log.append(
+                f"Raising the per-semester ceiling to {fix} credits would complete the "
+                f"plan by semester {prefs.target_semesters}."
+            )
+            rm.risks.append(
+                RiskFlag(
+                    "MEDIUM",
+                    "packing_extension",
+                    f"The extra semester is a packing effect, not a shortage of credits. "
+                    f"A ceiling of {fix} credits removes it; {prefs.max_credits} does not, "
+                    "because almost every elective on offer is a nine-credit course.",
+                )
+            )
+
+    def _minimum_ceiling(self, profile: StudentProfile, prefs: Preferences) -> int | None:
+        """Lowest ceiling, up to the UG Manual maximum, that avoids the extension."""
+        cap = self.cat.policy["load.absolute_max"]["value_max"]
+        for ceiling in range(prefs.max_credits + 1, cap + 1):
+            trial = Preferences(**{**prefs.__dict__, "max_credits": ceiling})
+            probe = self.solve(profile, trial, _allow_fallback=False)
+            if (
+                probe.verdict == FEASIBLE
+                and probe.graduation_semester
+                and probe.graduation_semester <= prefs.target_semesters
+            ):
+                return ceiling
+        return None
+
     def _max_duration(self, profile: StudentProfile):
         """The registration ceiling the UG Manual sets for this programme and batch."""
         cat = self.cat
@@ -1273,6 +1380,7 @@ class Engine:
                 + f". First cause: {cause}"
             )
         elif rm.graduation_semester and rm.graduation_semester > prefs.target_semesters:
+            self._explain_extension(rm, profile, prefs)
             rm.verdict = FEASIBLE_WITH_ADJUSTMENT
             rm.summary = (
                 f"All requirements are schedulable, but not by semester "
@@ -1347,6 +1455,20 @@ class Engine:
                     "when it offers them, those placements move.",
                 )
             )
+        if prefs.target_minor:
+            seat = cat.policy.get("minor.seat_cap")
+            rm.risks.append(
+                RiskFlag(
+                    "MEDIUM",
+                    "minor_seats",
+                    "Admission to a Minor is by seat availability alone and there is no "
+                    "CPI criterion (UG Manual 7.4.1(e), 7.4.6). A department admits at "
+                    "most 20 percent of its batch strength, so completing these courses "
+                    "does not by itself secure the Minor."
+                    if seat else "Minor admission depends on seat availability.",
+                )
+            )
+
         unnamed = [p for p in rm.placements if p.slot_type == "ELECTIVE"]
         if unnamed:
             rm.risks.append(
@@ -1395,8 +1517,8 @@ class Engine:
             RiskFlag(
                 "MEDIUM",
                 "seats",
-                "Scheduling a course does not guarantee a seat. Seat caps are not published "
-                "in the source data, so no allocation check was performed.",
+                "Scheduling a course does not guarantee a seat. Seat caps are not "
+                "published per course, so no allocation check was performed.",
             )
         )
         unresolved = [
