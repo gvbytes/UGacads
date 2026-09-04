@@ -1,0 +1,11 @@
+# Build output: regenerate with `python3 -m aptg_ingest.cli`
+out/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# macOS
+.DS_Store

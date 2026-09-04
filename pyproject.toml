@@ -1,0 +1,17 @@
+[project]
+name = "aptg-ingest"
+version = "0.1.0"
+description = "APTG data ingestion pipeline - IITK academic pathway data"
+requires-python = ">=3.11"
+dependencies = ["pypdf>=4.0"]
+
+[project.scripts]
+aptg-ingest = "aptg_ingest.cli:main"
+aptg-explorer = "aptg_ingest.explorer:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/aptg_ingest"]
