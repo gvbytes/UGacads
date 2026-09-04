@@ -12,4 +12,4 @@ run: the ME Y23 semester-6 student requesting the Aerospace Minor from
 prerequisite chain that cannot be satisfied, a named failure cause, and an alternative
 pathway — in a single screen.
 
-Naming on submission: `PoolName_VCA.mp4`.
+Naming on submission: `Kshatriyas_VCA.mp4` or `Kshatriyas_VCA.mov`.
