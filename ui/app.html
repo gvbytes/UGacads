@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APTG — Academic Pathway Generator</title>
+<style>
+:root{
+  --paper:#faf9f7; --ink:#1a1a1a; --muted:#6b6560; --faint:#918a83;
+  --rule:#d8d4cc; --rule-strong:#b8b2a8; --panel:#f2f0ec; --panel-2:#eceae4;
+  --accent:#5a6b47; --accent-soft:#eef1e8;
+  --warn:#8b4a2f; --warn-soft:#f6ece6;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --serif:Georgia,"Times New Roman",serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{--paper:#1a1917;--ink:#e8e4dd;--muted:#a09a92;--faint:#7d766e;
+        --rule:#35322d;--rule-strong:#4a463f;--panel:#232120;--panel-2:#2b2926;
+        --accent:#9bb07c;--accent-soft:#252a20;
+        --warn:#c88562;--warn-soft:#2e211a;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.55 var(--sans)}
+h1,h2,h3{font-family:var(--serif);font-weight:500;margin:0}
+code,.mono{font-family:var(--mono);font-size:.92em}
+button,input,select,textarea{font:inherit;color:inherit}
+
+header{border-bottom:1px solid var(--rule);padding:16px 28px;display:flex;
+  align-items:baseline;gap:16px;flex-wrap:wrap}
+header h1{font-size:17px}
+header .tag{color:var(--faint);font-size:11.5px;letter-spacing:.04em}
+header .right{margin-left:auto;color:var(--faint);font-size:11.5px}
+
+.layout{display:grid;grid-template-columns:min(410px,38vw) minmax(0,1fr)}
+
+/* Wide screens get two independently scrolling panes filling the viewport below the
+   header, so the roadmap stays put while the profile is edited and the submit button
+   is always on screen. Deriving the pane height from the flex row rather than from
+   100vh is what keeps the button visible: 100vh does not account for the header, so
+   the foot of the form fell below the fold. */
+@media (min-width:1041px){
+  body{height:100vh;overflow:hidden;display:flex;flex-direction:column}
+  /* The row must be capped too: a grid row is auto-sized to its content, so without
+     minmax(0,1fr) the form grows past the flex container instead of scrolling. */
+  .layout{flex:1;min-height:0;align-items:stretch;grid-template-rows:minmax(0,1fr)}
+  form{min-height:0}
+  main{overflow-y:auto;min-height:0}
+}
+@media (max-width:1040px){
+  .layout{grid-template-columns:1fr}
+  form{border-right:0;border-bottom:1px solid var(--rule)}
+  .form-scroll{overflow:visible}
+}
+
+/* The submit button is pinned to the foot of the form so it is reachable from any
+   scroll position rather than only from the bottom of a long profile. */
+form{border-right:1px solid var(--rule);display:flex;flex-direction:column;min-width:0}
+.form-scroll{overflow-y:auto;overflow-x:hidden;padding:20px 22px 8px;flex:1;min-height:0}
+.form-foot{padding:12px 22px 16px;border-top:1px solid var(--rule);background:var(--paper)}
+fieldset{border:0;padding:0;margin:0 0 22px;min-width:0}
+legend{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);
+  padding:0 0 7px;border-bottom:1px solid var(--rule);width:100%;margin-bottom:12px;
+  display:flex;align-items:baseline;gap:8px}
+legend .n{margin-left:auto;letter-spacing:0;text-transform:none;font-size:11px;
+  color:var(--accent);font-variant-numeric:tabular-nums}
+label{display:block;font-size:11.5px;color:var(--muted);margin:0 0 4px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.field{margin-bottom:12px;min-width:0}
+input[type=text],input[type=number],input[type=search],select,textarea{
+  width:100%;padding:7px 9px;background:var(--paper);border:1px solid var(--rule-strong);
+  border-radius:3px}
+select{cursor:pointer}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
+textarea{resize:vertical;min-height:52px;font-family:var(--mono);font-size:12px}
+.check{display:flex;align-items:flex-start;gap:8px;margin:0 0 9px;font-size:12.5px;
+  color:var(--muted)}
+.check input{width:auto;margin-top:2px;flex:none}
+.hint{font-size:11px;color:var(--faint);margin:4px 0 0;line-height:1.5}
+.submit{width:100%;padding:10px;background:var(--accent);color:var(--paper);border:0;
+  border-radius:3px;cursor:pointer;font-weight:500;letter-spacing:.02em}
+.submit:hover{filter:brightness(1.08)}
+.submit:disabled{opacity:.55;cursor:default}
+.btnrow{display:flex;gap:7px;margin-top:8px}
+.secondary{flex:1;padding:6px 8px;background:none;border:1px solid var(--rule-strong);
+  border-radius:3px;cursor:pointer;color:var(--muted);font-size:12px;white-space:nowrap}
+.secondary:hover{color:var(--ink);border-color:var(--accent)}
+
+/* The picker used to clip its own course titles: a flex child will not shrink below
+   its content unless min-width is cleared, so the title pushed past the panel edge. */
+.picker{border:1px solid var(--rule);border-radius:3px;height:270px;overflow-y:auto;
+  overflow-x:hidden;background:var(--panel)}
+.picker .semlabel{font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--faint);padding:7px 10px 4px;position:sticky;top:0;background:var(--panel);
+  border-bottom:1px solid var(--rule);z-index:1;display:flex;gap:6px;align-items:baseline}
+.picker .semlabel .pick{margin-left:auto;text-transform:none;letter-spacing:0;
+  cursor:pointer;color:var(--faint);border:0;background:none;font-size:10px;padding:0}
+.picker .semlabel .pick:hover{color:var(--accent);text-decoration:underline}
+.picker .opt{display:flex;align-items:baseline;gap:8px;padding:3px 10px;font-size:12px;
+  cursor:pointer;min-width:0}
+.picker .opt:hover{background:var(--panel-2)}
+.picker .opt input{width:auto;flex:none;align-self:center}
+.picker .opt code{color:var(--ink);flex:none}
+.picker .opt .t{color:var(--faint);overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;font-size:11px;flex:1;min-width:0}
+.picker .opt .cr{flex:none;color:var(--faint);font-size:10.5px;
+  font-variant-numeric:tabular-nums}
+.picker .opt.off{display:none}
+.picker mark{background:var(--accent-soft);color:var(--ink)}
+
+/* Facts about a chosen minor or programme, as a list rather than a run-on sentence. */
+.facts{list-style:none;margin:6px 0 0;padding:0;font-size:11px;color:var(--faint)}
+.facts li{padding:1.5px 0 1.5px 11px;position:relative;line-height:1.45}
+.facts li::before{content:'';position:absolute;left:2px;top:9px;width:3px;height:3px;
+  border-radius:50%;background:var(--rule-strong)}
+.facts li.warn{color:var(--warn)}
+.facts li.warn::before{background:var(--warn)}
+
+main{padding:22px 28px 80px;min-width:0}
+.empty{max-width:64ch;margin:52px auto 0;color:var(--muted)}
+.empty h2{font-size:17px;margin-bottom:8px;color:var(--ink)}
+.empty p{font-size:13px;line-height:1.6;margin:0 0 18px;max-width:60ch}
+.empty ol{margin:0 0 22px;padding-left:20px;font-size:12.5px;line-height:1.7}
+.empty ol code{color:var(--ink)}
+.constraints{list-style:none;margin:0;padding:0;display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0 22px}
+.constraints li{font-size:12px;padding:7px 0 7px 17px;border-top:1px solid var(--rule);
+  position:relative;color:var(--muted)}
+.constraints li b{color:var(--ink);font-weight:500;display:block;font-size:12.5px}
+.constraints li::before{content:'';position:absolute;left:0;top:14px;width:7px;
+  height:1px;background:var(--rule-strong)}
+.statline{display:flex;gap:20px;flex-wrap:wrap;margin:0 0 18px;padding:0 0 16px;
+  border-bottom:1px solid var(--rule)}
+.statline div{min-width:0}
+.statline .k{font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--faint);display:block}
+.statline .v{font:500 15px/1.3 var(--serif);color:var(--ink);
+  font-variant-numeric:tabular-nums}
+.statline .v.warn{color:var(--warn)}
+
+.verdict{border:1px solid var(--rule-strong);border-left-width:3px;border-radius:2px;
+  padding:13px 16px;margin:0 0 20px;background:var(--panel)}
+.verdict.ok{border-left-color:var(--accent);background:var(--accent-soft)}
+.verdict.adj{border-left-color:var(--warn);background:var(--warn-soft)}
+.verdict.no{border-left-color:var(--warn);background:var(--warn-soft)}
+.verdict h2{font-size:15px;margin:0 0 4px}
+.verdict p{margin:0;color:var(--muted);font-size:13px;max-width:80ch}
+
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--rule);margin:0 0 18px}
+.tabs button{background:none;border:0;border-bottom:2px solid transparent;
+  padding:7px 14px 6px;color:var(--muted);cursor:pointer;font-size:13px}
+.tabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--accent);font-weight:500}
+.tabs button:hover{color:var(--ink)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:14px}
+.sem{border:1px solid var(--rule);border-radius:2px;overflow:hidden}
+.sem.summer{border-style:dashed}
+.sem.summer header{background:transparent}
+.sem.summer header b{font-style:italic}
+.sem header{padding:7px 11px;border-bottom:1px solid var(--rule);background:var(--panel);
+  display:flex;align-items:baseline;gap:8px}
+.sem header b{font:500 13px/1 var(--serif)}
+.sem header .p{font-size:10.5px;color:var(--faint);letter-spacing:.05em}
+.sem header .c{margin-left:auto;font-size:11.5px;color:var(--muted);
+  font-variant-numeric:tabular-nums}
+.sem ul{list-style:none;margin:0;padding:4px 0}
+.sem li{padding:5px 11px;border-bottom:1px solid var(--rule);font-size:12.5px}
+.sem li:last-child{border-bottom:0}
+.sem li .top{display:flex;gap:7px;align-items:baseline}
+.sem li code{font-weight:500}
+.sem li .cr{margin-left:auto;color:var(--faint);font-variant-numeric:tabular-nums;
+  font-size:11.5px}
+.sem li .why{font-size:11px;color:var(--faint);margin-top:2px;line-height:1.4}
+.sem.intern{opacity:.72}
+
+.pill{display:inline-block;font-size:9.5px;letter-spacing:.05em;padding:1px 5px;
+  border:1px solid var(--rule-strong);color:var(--muted);border-radius:2px;
+  text-transform:uppercase}
+.pill.minor{border-color:var(--accent);color:var(--accent)}
+.pill.warn{border-color:var(--warn);color:var(--warn)}
+
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th{text-align:left;font-weight:500;color:var(--faint);font-size:10.5px;letter-spacing:.07em;
+  text-transform:uppercase;padding:0 10px 6px 0;border-bottom:1px solid var(--rule-strong)}
+td{padding:6px 10px 6px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+.num{text-align:right;font-variant-numeric:tabular-nums;padding-right:16px}
+
+.risk{border-left:2px solid var(--rule-strong);padding:6px 0 6px 13px;margin:0 0 12px;
+  max-width:84ch}
+.risk.HIGH{border-left-color:var(--warn)}
+.risk.MEDIUM{border-left-color:var(--rule-strong)}
+.risk .k{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.risk p{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
+.log{list-style:none;margin:0;padding:0;max-width:88ch}
+.log li{padding:6px 0 6px 15px;border-left:2px solid var(--rule);color:var(--muted);
+  font-size:12.5px;margin-bottom:2px}
+.log li::marker{content:''}
+.alt{margin-top:26px;padding-top:18px;border-top:1px solid var(--rule)}
+.alt h3{font-size:14px;margin-bottom:3px}
+.alt .lede{color:var(--faint);font-size:12.5px;margin:0 0 14px}
+.spin{color:var(--faint);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <h1>APTG</h1>
+  <span class="tag">Algorithmic Academic Pathway &amp; Template Generator</span>
+  <span class="right" id="cat-note">loading catalogue…</span>
+</header>
+
+<div class="layout">
+<form id="f">
+ <div class="form-scroll">
+  <fieldset>
+    <legend>Student</legend>
+    <div class="row">
+      <div><label for="batch">Batch</label>
+        <select id="batch"></select></div>
+      <div><label for="sem">Current semester</label>
+        <select id="sem"></select></div>
+    </div>
+    <div class="field"><label for="prog">Programme</label>
+      <select id="prog"></select>
+      <ul class="facts" id="prog-note"></ul></div>
+    <div class="row">
+      <div><label for="dept">Department</label><select id="dept"></select></div>
+      <div><label for="cpi">CPI</label>
+        <input type="number" id="cpi" step="0.01" min="0" max="10" value="8.5"></div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Completed courses <span class="n" id="picked">0 selected</span></legend>
+    <div class="field" style="margin-bottom:8px">
+      <input type="search" id="filter" placeholder="Filter by code or title" aria-label="Filter courses">
+    </div>
+    <div class="picker" id="picker"><p class="hint" style="padding:10px">
+      Choose a programme first.</p></div>
+    <div class="btnrow">
+      <button type="button" class="secondary" id="fill">Up to semester&nbsp;<span id="fill-n">1</span></button>
+      <button type="button" class="secondary" id="clear">Clear all</button>
+    </div>
+    <div class="field" style="margin-top:12px">
+      <label for="extra">Other completed courses</label>
+      <textarea id="extra" placeholder="ESO207, CS201"></textarea>
+      <p class="hint">Comma or space separated codes not listed above. A code is matched
+        however it is spelled — <code>MTH111</code> finds <code>MTH111M</code>.</p>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Preferences</legend>
+    <div class="field"><label for="minor">Target minor</label>
+      <select id="minor"><option value="">None</option></select>
+      <ul class="facts" id="minor-note"></ul></div>
+    <div class="row">
+      <div><label for="maxc">Max credits / semester</label>
+        <input type="number" id="maxc" value="55" min="27" max="65"></div>
+      <div><label for="targ">Graduate by semester</label>
+        <input type="number" id="targ" value="8" min="4" max="12"></div>
+    </div>
+    <div class="check"><input type="checkbox" id="ext" checked>
+      <label for="ext" style="margin:0">Allow extending beyond that semester</label></div>
+    <div class="check"><input type="checkbox" id="summer">
+      <label for="summer" style="margin:0">Willing to take summer courses
+        <span class="hint" style="display:block;margin-top:1px">At most 27 credits
+        (UG&nbsp;Manual&nbsp;4.3.6), from a much smaller course set.</span></label></div>
+    <div class="field" style="margin-top:12px"><label for="interests">Career interests</label>
+      <input type="text" id="interests" placeholder="robotics, control, machine learning">
+      <p class="hint">Only ranks courses that already satisfy every hard constraint.</p></div>
+  </fieldset>
+ </div>
+ <div class="form-foot">
+   <button type="submit" class="submit" id="go">Generate roadmap</button>
+ </div>
+</form>
+
+<main id="out">
+  <div class="empty">
+    <h2>A roadmap you can check</h2>
+    <p>APTG builds a semester-by-semester plan from IIT Kanpur's published templates,
+      schedules and UG Manual. Every placement carries the reason it is there, and every
+      rejection names the constraint responsible.</p>
+    <ol>
+      <li>Set your batch, programme and current semester.</li>
+      <li>Tick the courses you have already cleared.</li>
+      <li>Add a target minor, a workload ceiling or a career interest.</li>
+    </ol>
+    <ul class="constraints">
+      <li><b>Prerequisites</b> Evaluated as a boolean expression over everything
+        completed or scheduled earlier.</li>
+      <li><b>Curriculum sequencing</b> No course is placed before the semester its own
+        template assigns it.</li>
+      <li><b>Semester availability</b> A course seen only in odd terms cannot sit in an
+        even semester.</li>
+      <li><b>Credit limits</b> Your ceiling, capped by the UG Manual's 65 — and 27 in
+        the summer term.</li>
+      <li><b>Eligibility</b> Batch windows, departmental CPI cutoffs, and the rule that
+        a minor may not be in your own department.</li>
+      <li><b>Maximum duration</b> Capped per programme and batch by UG Manual 3.2.</li>
+    </ul>
+  </div>
+</main>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let CAT = null, TEMPLATE = [];
+
+async function boot(){
+  CAT = await (await fetch('/api/catalogue')).json();
+  $('cat-note').textContent =
+    `${CAT.counts.courses.toLocaleString('en-IN')} courses · ${CAT.programmes.length} programmes · ${CAT.minors.length} minors`;
+
+  const now = 26;
+  $('batch').innerHTML = Array.from({length:7},(_,i)=>now-i)
+    .map(y=>`<option${y===24?' selected':''}>Y${y}</option>`).join('');
+  $('sem').innerHTML = Array.from({length:10},(_,i)=>i+1)
+    .map(n=>`<option${n===6?' selected':''}>${n}</option>`).join('');
+  $('dept').innerHTML = CAT.departments.map(d=>
+    `<option${d==='ME'?' selected':''}>${esc(d)}</option>`).join('');
+
+  const withSlots = CAT.programmes.filter(p=>p.slots>0)
+    .sort((a,b)=> b.slots-a.slots || a.programme_id.localeCompare(b.programme_id));
+  $('prog').innerHTML = withSlots.map(p=>
+    `<option value="${esc(p.programme_id)}"${p.programme_id==='ME-BT'?' selected':''}>${esc(p.programme_id)} — ${esc(p.name)}</option>`).join('');
+
+  $('minor').innerHTML = '<option value="">None</option>' + CAT.minors.map(m=>
+    `<option value="${esc(m.minor_id)}">${esc(m.department)} · ${esc(m.stream)}${
+      m.variant==='ALL'?'':` (${esc(m.variant)})`}</option>`).join('');
+
+  $('prog').addEventListener('change', loadTemplate);
+  $('minor').addEventListener('change', minorNote);
+  $('fill').addEventListener('click', fillUpTo);
+  $('clear').addEventListener('click', clearPicked);
+  $('filter').addEventListener('input', applyFilter);
+  $('sem').addEventListener('change', ()=>{ $('fill-n').textContent = $('sem').value; });
+  $('picker').addEventListener('change', countPicked);
+  $('extra').addEventListener('input', countPicked);
+  $('f').addEventListener('submit', submit);
+  $('fill-n').textContent = $('sem').value;
+  await loadTemplate();
+}
+
+// Facts about a selection, one per line. A run-on sentence of eight clauses is not
+// something anyone reads; a short list is.
+function facts(el, items){
+  el.innerHTML = items.map(([text, warn]) =>
+    `<li${warn?' class="warn"':''}>${esc(text)}</li>`).join('');
+}
+
+function progNote(){
+  const p = CAT.programmes.find(x=>x.programme_id===$('prog').value);
+  if(!p){ facts($('prog-note'), []); return; }
+  const out = [[`${p.slots} template slots over ${p.semesters} semesters`]];
+  if(p.batch_from || p.batch_to)
+    out.push([`batches ${p.batch_from||'…'} to ${p.batch_to||'…'}`]);
+  if(p.internship_semesters.length)
+    out.push([`semesters ${p.internship_semesters.join(', ')} are internship — no course capacity`, true]);
+  if(p.confidence === 'TENTATIVE')
+    out.push(['this template is provisional in its source', true]);
+  facts($('prog-note'), out);
+  if(p.department) $('dept').value = p.department;
+}
+
+function minorNote(){
+  const m = CAT.minors.find(x=>x.minor_id===$('minor').value);
+  if(!m){ facts($('minor-note'), []); return; }
+  const out = [];
+  const need = [];
+  if(m.compulsory.length) need.push(`${m.compulsory.length} compulsory`);
+  if(m.choose_n) need.push(`${m.choose_n} from a basket of ${m.choices.length}`);
+  const n = m.compulsory.length + m.choose_n;
+  out.push([`${n} course${n===1?'':'s'} — ${need.join(', ')} — for ${
+    m.credits_min === m.credits_max ? `${m.credits_min} credits`
+                                    : `${m.credits_min}–${m.credits_max} credits`}`]);
+  out.push([m.batch_from ? `open to batches ${m.batch_from} onward`
+          : m.batch_to ? `open to batches up to ${m.batch_to}` : 'open to all batches']);
+  if(m.cpi_min != null) out.push([`departmental CPI cutoff of ${m.cpi_min.toFixed(1)}`, true]);
+  if(m.seat_cap != null) out.push([`capped at ${m.seat_cap} students — selection is competitive`, true]);
+  if(m.department === $('dept').value)
+    out.push(['this is your own department; a minor must be in another', true]);
+  // TENTATIVE has two quite different causes and the student should be told which:
+  // a basket the source states as a rule rather than a list, or one thinned because
+  // courses it names are in none of the loaded schedules.
+  if(m.unresolved && m.unresolved.length)
+    out.push([`${m.unresolved.length} listed course${m.unresolved.length>1?'s are':' is'} in none of the loaded schedules: ${m.unresolved.join(', ')}`, true]);
+  else if(m.confidence === 'TENTATIVE')
+    out.push(['the source states this basket as a rule, not a closed list', true]);
+  facts($('minor-note'), out);
+}
+
+function countPicked(){
+  const n = $('picker').querySelectorAll('input:checked').length;
+  const extra = ($('extra').value||'').split(/[\s,;]+/).filter(Boolean).length;
+  const total = n + extra;
+  $('picked').textContent = total ? `${total} selected` : 'none selected';
+}
+
+function applyFilter(){
+  const q = ($('filter').value||'').trim().toLowerCase();
+  $('picker').querySelectorAll('.opt').forEach(el=>{
+    el.classList.toggle('off', !!q && !el.dataset.hay.includes(q));
+  });
+  // A semester heading with nothing left under it is noise.
+  $('picker').querySelectorAll('.grp').forEach(g=>{
+    g.style.display = g.querySelector('.opt:not(.off)') ? '' : 'none';
+  });
+}
+
+function clearPicked(){
+  $('picker').querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
+  countPicked();
+}
+
+async function loadTemplate(){
+  progNote();
+  const pid = $('prog').value;
+  const r = await (await fetch('/api/template?programme_id='+encodeURIComponent(pid))).json();
+  TEMPLATE = r.courses;
+  const bySem = {};
+  TEMPLATE.forEach(c => (bySem[c.semester] = bySem[c.semester] || []).push(c));
+  const groups = Object.keys(bySem).sort((a,b)=>Number(a)-Number(b));
+  $('picker').innerHTML = groups.length
+    ? groups.map(s=>{
+        const items = bySem[s].map(c=>{
+          const hay = `${c.code} ${c.title||''}`.toLowerCase();
+          return `<label class="opt" data-hay="${esc(hay)}">
+            <input type="checkbox" value="${esc(c.code)}" data-sem="${c.semester}">
+            <code>${esc(c.code)}</code><span class="t">${esc(c.title||'')}</span>
+            <span class="cr">${c.credits ?? ''}</span></label>`;
+        }).join('');
+        return `<div class="grp"><div class="semlabel">Semester ${esc(s)}
+          <button type="button" class="pick" data-sem="${esc(s)}">all</button></div>${items}</div>`;
+      }).join('')
+    : '<p class="hint" style="padding:10px">This template names no specific courses. Use the free-text box below.</p>';
+  $('picker').querySelectorAll('.pick').forEach(b=>b.addEventListener('click', ev=>{
+    ev.preventDefault();
+    const boxes = [...$('picker').querySelectorAll(`input[data-sem="${b.dataset.sem}"]`)];
+    const turnOn = boxes.some(cb=>!cb.checked);
+    boxes.forEach(cb=>cb.checked = turnOn);
+    countPicked();
+  }));
+  fillUpTo();
+  applyFilter();
+  minorNote();
+}
+
+function fillUpTo(){
+  const upto = Number($('sem').value);
+  $('picker').querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.checked = Number(cb.dataset.sem) < upto;
+  });
+  countPicked();
+}
+
+function completedCodes(){
+  const set = new Set();
+  $('picker').querySelectorAll('input:checked').forEach(cb=>set.add(cb.value));
+  ($('extra').value||'').split(/[\s,;]+/).forEach(c=>{ if(c) set.add(c.trim().toUpperCase()); });
+  return [...set];
+}
+
+async function submit(ev){
+  ev.preventDefault();
+  $('go').disabled = true; $('go').textContent = 'Solving…';
+  $('out').innerHTML = '<p class="spin">Applying constraints…</p>';
+  const body = {
+    batch: $('batch').value,
+    department: $('dept').value,
+    programme_id: $('prog').value,
+    current_semester: Number($('sem').value),
+    cpi: $('cpi').value,
+    completed: completedCodes(),
+    target_minor: $('minor').value || null,
+    max_credits: Number($('maxc').value),
+    target_semesters: Number($('targ').value),
+    allow_extension: $('ext').checked,
+    allow_summer: $('summer').checked,
+    max_semesters: $('ext').checked ? 12 : Number($('targ').value),
+    career_interests: ($('interests').value||'').split(',').map(s=>s.trim()).filter(Boolean)
+  };
+  try{
+    const res = await fetch('/api/plan',{method:'POST',headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body)});
+    const data = await res.json();
+    if(data.error) throw new Error(data.error);
+    render(data);
+  }catch(e){
+    $('out').innerHTML = `<div class="verdict no"><h2>Request failed</h2><p>${esc(e.message)}</p></div>`;
+  }finally{
+    $('go').disabled = false; $('go').textContent = 'Generate roadmap';
+  }
+}
+
+const VERDICT = {
+  FEASIBLE:{cls:'ok',label:'Feasible'},
+  FEASIBLE_WITH_ADJUSTMENT:{cls:'adj',label:'Feasible with adjustment'},
+  CURRENTLY_INFEASIBLE:{cls:'no',label:'Currently infeasible'}
+};
+
+function roadmapHTML(d){
+  return `<div class="grid">${d.semesters.map(s=>`
+    <section class="sem${s.courses.some(c=>c.slot_type==='INTERNSHIP')?' intern':''}${
+      s.is_summer?' summer':''}">
+      <header><b>${s.is_summer?`Summer &middot; after ${s.semester}`:`Semester ${s.semester}`}</b
+        ><span class="p">${esc(s.parity)}</span>
+        <span class="c">${s.credits} cr</span></header>
+      <ul>${s.courses.map(c=>`
+        <li><div class="top">
+          <code>${esc(c.code||c.label)}</code>
+          <span class="pill${c.origin==='minor'?' minor':''}">${esc(c.slot_type)}</span>
+          <span class="cr">${c.credits}</span></div>
+          <div class="why">${esc(c.reason)}</div></li>`).join('')}</ul>
+    </section>`).join('')}</div>
+    ${d.unplaced.length ? `<div class="alt"><h3>Could not be scheduled</h3>
+      <table><thead><tr><th>Requirement</th><th>Type</th><th class="num">Credits</th>
+      <th>Why not</th></tr></thead><tbody>${d.unplaced.map(u=>`
+      <tr><td>${esc(u.label)}</td><td>${esc(u.slot_type)}</td>
+      <td class="num">${u.credits}</td><td>${esc(u.reason||'')}</td></tr>`).join('')}
+      </tbody></table></div>` : ''}`;
+}
+
+function render(d){
+  const v = VERDICT[d.verdict] || VERDICT.CURRENTLY_INFEASIBLE;
+  const tabs = [['plan','Roadmap'],['why','Explainability'],['risk',`Risk flags (${d.risks.length})`],
+                ['rej',`Rejected (${d.rejections.length})`]];
+  if(d.alternative) tabs.push(['alt','Alternative']);
+  // The figures a student checks first, before reading anything.
+  const regular = d.semesters.filter(s=>!s.is_summer);
+  const summers = d.semesters.filter(s=>s.is_summer);
+  const total = d.semesters.reduce((a,s)=>a+s.credits,0);
+  const heaviest = regular.reduce((a,s)=>Math.max(a,s.credits),0);
+  const high = d.risks.filter(r=>r.level==='HIGH').length;
+  const stats = [
+    ['Graduates', d.graduation_semester ? `semester ${d.graduation_semester}` : '—'],
+    ['Total credits', total],
+    ['Heaviest semester', heaviest ? `${heaviest} cr` : '—'],
+    ...(summers.length ? [['Summer terms', summers.length]] : []),
+    ...(d.unplaced.length ? [['Unscheduled', `${d.unplaced.length}`, true]] : []),
+    ['High risks', high, high>0],
+  ];
+
+  $('out').innerHTML = `
+    <div class="verdict ${v.cls}">
+      <h2>${v.label}${d.graduation_semester?` — completes in semester ${d.graduation_semester}`:''}</h2>
+      <p>${esc(d.summary)}</p>
+    </div>
+    <div class="statline">${stats.map(([k,val,warn])=>
+      `<div><span class="k">${esc(k)}</span
+        ><span class="v${warn?' warn':''}">${esc(val)}</span></div>`).join('')}</div>
+    <div class="tabs">${tabs.map(([k,l],i)=>
+      `<button data-t="${k}" aria-selected="${i===0}">${esc(l)}</button>`).join('')}</div>
+    <div id="panel"></div>`;
+
+  const panels = {
+    plan: () => roadmapHTML(d),
+    why: () => `<ul class="log">${d.log.map(l=>`<li>${esc(l)}</li>`).join('')}</ul>`,
+    risk: () => d.risks.length
+      ? d.risks.map(r=>`<div class="risk ${esc(r.level)}"><div class="k">${esc(r.level)} · ${esc(r.kind.replace(/_/g,' '))}</div><p>${esc(r.message)}</p></div>`).join('')
+      : '<p class="spin">No risk flags raised.</p>',
+    rej: () => d.rejections.length
+      ? `<table><thead><tr><th>Semester</th><th>Course</th><th>Reason it was not placed there</th></tr></thead>
+         <tbody>${d.rejections.map(r=>`<tr><td class="num" style="text-align:left">${r.semester}</td>
+         <td><code>${esc(r.code||r.label)}</code></td><td>${esc(r.reason)}</td></tr>`).join('')}</tbody></table>`
+      : '<p class="spin">Nothing was rejected; every requirement fitted its first eligible semester.</p>',
+    alt: () => d.alternative ? `<div class="alt" style="border:0;margin:0;padding:0">
+        <h3>${esc(d.alternative.label)}</h3>
+        <p class="lede">${esc(d.alternative.summary)}</p>
+        ${roadmapHTML(d.alternative)}</div>` : ''
+  };
+  const show = k => {
+    document.querySelectorAll('.tabs button').forEach(b=>
+      b.setAttribute('aria-selected', String(b.dataset.t===k)));
+    $('panel').innerHTML = panels[k]();
+  };
+  document.querySelectorAll('.tabs button').forEach(b=>
+    b.addEventListener('click',()=>show(b.dataset.t)));
+  show('plan');
+}
+
+boot();
+</script>
+</body>
+</html>
