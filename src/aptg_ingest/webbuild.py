@@ -130,6 +130,16 @@ def build_page(app_html: Path, site: Path) -> int:
     """
     html = app_html.read_text()
     html = html.replace("</head>", BOOT_STYLE + "</head>", 1)
+
+    # On the published site the two pages sit side by side, so each links to the other.
+    # The link is added here rather than in ui/app.html because the local server has no
+    # explorer route to point at.
+    html = html.replace(
+        '<span class="right" id="cat-note">loading catalogue…</span>',
+        '<span class="right" id="cat-note">loading catalogue…</span>'
+        '<a class="right" href="explorer.html" style="margin-left:16px">Data explorer</a>',
+        1,
+    )
     html = html.replace(
         "<script>",
         '<script src="bootstrap.js"></script>\n<script>',
@@ -159,6 +169,16 @@ def build(root: Path, site: Path, db: Path) -> dict:
     from .explorer import render
 
     render(str(db), str(site / "explorer.html"), str(root / "out" / "reports" / "ingest_report.json"))
+    explorer = site / "explorer.html"
+    explorer.write_text(
+        explorer.read_text().replace(
+            "<nav>\n  <h1>APTG Data</h1>",
+            '<nav>\n  <h1>APTG Data</h1>\n'
+            '  <p class="sub" style="margin-bottom:8px">'
+            '<a href="index.html">&larr; Back to the planner</a></p>',
+            1,
+        )
+    )
     return {
         "db_before": before,
         "db_after": after,
