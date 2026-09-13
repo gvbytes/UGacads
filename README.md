@@ -4,7 +4,7 @@ Turns a real IIT Kanpur student profile into a semester-by-semester roadmap that
 mathematically valid under the institute's published rules — and says why, in full,
 including why it refused what it refused.
 
-Built for the Anweshan'26 UG Academics problem statement by pool **Kshatriyas**.
+Built for the Anweshan'26 UG Academics problem statement.
 
 ## Quick start
 
