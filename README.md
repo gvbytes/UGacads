@@ -1,5 +1,7 @@
 # APTG — Algorithmic Academic Pathway and Template Generator
 
+**Site** - https://gvbytes.github.io/UGacads/
+
 Turns a real IIT Kanpur student profile into a semester-by-semester roadmap that is
 mathematically valid under the institute's published rules — and says why, in full,
 including why it refused what it refused.
